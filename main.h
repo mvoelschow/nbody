@@ -98,7 +98,7 @@ void zoom_out_at_mouse_position(settings *sim_set);
 void zoom_in_at_mouse_position(settings *sim_set);
 
 // From num.c
-void adaptive_rkf_step(planet objects[], settings *sim_set);
+void adaptive_rkn45_step(planet objects[], settings *sim_set);
 
 // From output.c
 void Generate_Output_File( planet objects[], settings *sim_set );
