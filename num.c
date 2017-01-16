@@ -5,7 +5,7 @@
 #include <time.h>
 // #include <omp.h>
 
-#include "nbody.h"
+#include "main.h"
 
 
 
