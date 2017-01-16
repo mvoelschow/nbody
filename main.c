@@ -191,7 +191,7 @@ Draw_Background(renderer, background, &sim_set);
 
 // Update bodies
 if ( sim_set.paused != 1 ){
-adaptive_rkf_step(objects, &sim_set);
+adaptive_rkn45_step(objects, &sim_set);
 }
 else{
 render_paused(renderer, fntCourier, &sim_set);
