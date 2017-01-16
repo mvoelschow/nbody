@@ -2,8 +2,8 @@
 ####################                    nbody 			  ####################
 ######################################################################################
 
-nbody is a simple n-body code written in C and utilizing the SDL2 library for some decent
-graphics, making it a nice tool to run interactive n-body simulations for scientific or 
+nbody is a simple n-body code written in C and utilizing the SDL2 library for graphical
+output, making it a nice tool to run interactive n-body simulations for scientific or 
 educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
