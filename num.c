@@ -159,7 +159,7 @@ vy0 = object.vel[1];
 vz0 = object.vel[2];
 
 // m/s²
-get_acc_vector(objects, sim_set, k, loc, acc);
+get_acc_vector_toff(objects, sim_set, k, 0., loc, acc);
 fx[0] = acc[0];
 fy[0] = acc[1];
 fz[0] = acc[2];
