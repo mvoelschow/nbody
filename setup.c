@@ -26,7 +26,7 @@ void init_settings(settings *sim_set){
 // *******************************
 // Total number of particles to simulate
 // *******************************
-sim_set->n_bodies = 500;
+sim_set->n_bodies = 200;
 
 
 // *******************************
@@ -80,7 +80,7 @@ sim_set->draw_background = 1;
 sim_set->output_interval = 0.1*YR;
 
 // Automatically output screenshots
-sim_set->auto_screenshot = 1;
+sim_set->auto_screenshot = 0;
 
 // Automatically output text file with kinetic parameters of all bodies
 sim_set->auto_textfile = 0;
