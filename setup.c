@@ -23,7 +23,6 @@ double randomDouble(){
 // ***********************************************************
 void init_settings(settings *sim_set){
 
-      
 // *******************************
 // Total number of particles to simulate
 // *******************************
@@ -41,7 +40,6 @@ sim_set->integrator = 7;
 sim_set->eps_vel_thresh = 1.E-10;
 sim_set->eps_pos_thresh = 1.E-10;
 
-      
 // *******************************
 // Time settings
 // *******************************
@@ -50,7 +48,7 @@ sim_set->eps_pos_thresh = 1.E-10;
 sim_set->timestep_max = 100.;
 
 // Time at which the simulation ends [days]
-sim_set->time_end = 1.E2*YR;
+sim_set->time_end = 1.E3*YR;
 
 
 // *******************************
@@ -73,7 +71,7 @@ sim_set->scale_min = 0.1;
 sim_set->scale_max = 100.;
 
 // Size of body icons [pixels]
-sim_set->icon_size = 4;
+sim_set->icon_size = 10;
 
 // Maximum icon size in pseudo 3D rendering mode
 sim_set->icon_size_max = 20;
@@ -83,7 +81,6 @@ sim_set->draw_background = 1;
 
 // VSYNC on/off (framerate cap at 60 FPS)
 sim_set->vsync = 0;
-
 
 // *******************************
 // Data output
@@ -141,10 +138,12 @@ double p_orb, r_planet;
 // Sun
 objects[0].ident = 0;
 objects[0].mass = M_SUN;
+objects[0].icon_num = 0;
 
 // Massive planet
 objects[1].ident = 1;
 objects[1].mass = 1.E-2*M_SUN;
+objects[1].icon_num = 5;
 
 r_planet = 6.; // [au]
 
@@ -176,6 +175,7 @@ for(i=2; i<sim_set->n_bodies; i=i+1){
 
 // Set body mass [kg]
 objects[i].mass = 1.E19*(99.*randomDouble()+1.);
+objects[i].icon_num = 1;
 
 r = 2+3.*randomDouble();
 phi = randomDouble()*2.*PI;
