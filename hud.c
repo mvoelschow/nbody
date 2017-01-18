@@ -370,7 +370,7 @@ select = sim_set->selected_object;
 // Calculate some interesting stuff
 
 // Absolute value of velocity [km/s]
-v = sqrt(objects[select].vel[0]*objects[select].vel[0]+objects[select].vel[1]*objects[select].vel[1]+objects[select].vel[2]*objects[select].vel[2])*AU/86400.E3;
+v = sqrt(objects[select].vel[0]*objects[select].vel[0]+objects[select].vel[1]*objects[select].vel[1]+objects[select].vel[2]*objects[select].vel[2]);
 
 // Render box
 
