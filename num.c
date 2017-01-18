@@ -577,7 +577,7 @@ double alpha[n];
 double beta[n][n];
 double gamma[n][n];
 
-double cifi[3], cdotifi[3], chatifi[3];
+double cifi[3], cdotifi[3];
 
 double dtoau, dte_3, dte_3dtoau;
 
@@ -643,15 +643,6 @@ c_dot[4] = 25./144.;
 c_dot[5] = 25./96.;
 c_dot[6] = 19./288.;
 
-c_hat[0] = c[0];
-c_hat[1] = c[1];
-c_hat[2] = c[2];
-c_hat[3] = 0.;
-c_hat[4] = c[3];
-c_hat[5] = c[4];
-c_hat[6] = c[5];
-c_hat[7] = c[6];
-
 dt = sim_set->timestep * 86400.; // days -> sec
 dtsq = dt*dt;
 dte_3 = dt*1.e-3;
@@ -688,10 +679,6 @@ cifi[2] = c[0]*fz[0];
 cdotifi[0] = c_dot[0]*fx[0];
 cdotifi[1] = c_dot[0]*fy[0];
 cdotifi[2] = c_dot[0]*fz[0];
-
-chatifi[0] = c_hat[0]*fx[0];
-chatifi[1] = c_hat[0]*fy[0];
-chatifi[2] = c_hat[0]*fz[0];
 
 dx=0.;
 dy=0.;
@@ -731,10 +718,6 @@ for(i=1; i<n; i++){
 		cdotifi[1] = cdotifi[1] + fy[i]*c_dot[i];
 		cdotifi[2] = cdotifi[2] + fz[i]*c_dot[i];
 	}
-
-	chatifi[0] = chatifi[0] + fx[i]*c_hat[i];
-	chatifi[1] = chatifi[1] + fy[i]*c_hat[i];
-	chatifi[2] = chatifi[2] + fz[i]*c_hat[i];
 	
 }
 
@@ -804,7 +787,7 @@ void adaptive_rkn67_step(planet objects[], settings *sim_set){
 int check;
 check=1;
 
-check = rkn56_step(objects, sim_set);
+check = rkn67_step(objects, sim_set);
 
 }
 
@@ -1089,6 +1072,6 @@ void adaptive_rkn78_step(planet objects[], settings *sim_set){
 int check;
 check=1;
 
-check = rkn56_step(objects, sim_set);
+check = rkn78_step(objects, sim_set);
 
 }
