@@ -54,6 +54,8 @@ double zoom_factor;
 int icon_mode;
 double icon_size;
 double icon_size_max;
+int vsync;
+int integrator;
 } settings;
 
 
