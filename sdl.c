@@ -338,12 +338,13 @@ SDL_FreeSurface(img_surf);
 
 
 
-void load_object_textures(SDL_Renderer *renderer, planet objects[], settings *sim_set){
+void load_object_textures(SDL_Renderer *renderer, settings *sim_set){
 int i;
 
-for (i=0; i<sim_set->n_bodies; i++){
-load_texture(renderer, &objects[i].icon, "sprites/sun_icon.bmp");
-}
+load_texture(renderer, &sim_set->icon_sun, "sprites/sun_icon.bmp");
+load_texture(renderer, &sim_set->icon_jupiter, "sprites/jupiter_icon.bmp");
+load_texture(renderer, &sim_set->icon_earth, "sprites/earth_icon.bmp");
+load_texture(renderer, &sim_set->icon_mercury, "sprites/mercury_icon.bmp");
 
 }
 
@@ -377,7 +378,14 @@ stretchRect.y = object->screen_pos[1] - 0.5*sim_set->icon_size;
 stretchRect.w = sim_set->icon_size; 
 stretchRect.h = sim_set->icon_size; 
 
-SDL_RenderCopy(renderer, object->icon, NULL, &stretchRect);
+switch(object->icon_num) {
+	case 0: SDL_RenderCopy(renderer, sim_set->icon_sun, NULL, &stretchRect) ; break;
+	case 1: SDL_RenderCopy(renderer, sim_set->icon_mercury, NULL, &stretchRect) ; break;
+	case 3: SDL_RenderCopy(renderer, sim_set->icon_earth, NULL, &stretchRect) ; break;
+	case 5: SDL_RenderCopy(renderer, sim_set->icon_jupiter, NULL, &stretchRect) ; break;
+	default: SDL_RenderCopy(renderer, sim_set->icon_sun, NULL, &stretchRect) ; break;
+}
+
 
 }
 
@@ -396,13 +404,20 @@ stretchRect.w = size;
 stretchRect.h = size; 
 
 scale = (int)(255*brightness);
-icon_modified = object->icon;
+
+switch(object->icon_num) {
+	case 0: icon_modified = sim_set->icon_sun; break;
+	case 1: icon_modified = sim_set->icon_mercury; break;
+	case 3: icon_modified = sim_set->icon_earth; break;
+	case 5: icon_modified = sim_set->icon_jupiter; break;
+	default: icon_modified = sim_set->icon_sun; break;
+}
+
 SDL_SetTextureColorMod(icon_modified, scale, scale, scale);
 
 SDL_RenderCopy(renderer, icon_modified, NULL, &stretchRect);
 
 }
-
 
 
 
