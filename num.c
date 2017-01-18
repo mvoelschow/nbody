@@ -88,7 +88,7 @@ double gamma[n][n];
 
 double cifi[3], cdotifi[3], chatifi[3];
 
-double dtoau, dte_3;
+double dtoau, dte_3, dte_3dtoau;
 
 alpha[0] = 0.;
 alpha[1] = 0.25;
@@ -142,6 +142,7 @@ dt = sim_set->timestep * 86400.; // days -> sec
 dtsq = dt*dt;
 dte_3 = dt*1.e-3;
 dtoau = dt/AU;
+dte_3dtoau = dte_3*dtoau;
 
 for(k=0; k<sim_set->n_bodies; k++){
 
@@ -193,13 +194,12 @@ for(i=1; i<n; i++){
 	}
 
 	// AU
-	loc[0] = object.pos[0] + vx0*alpha[i]*dtoau + dte_3 * dx * dtoau;
-	loc[1] = object.pos[1] + vy0*alpha[i]*dtoau + dte_3 * dy * dtoau;
-	loc[2] = object.pos[2] + vz0*alpha[i]*dtoau + dte_3 * dz * dtoau;
+	loc[0] = object.pos[0] + vx0*alpha[i]*dtoau + dx * dte_3dtoau;
+	loc[1] = object.pos[1] + vy0*alpha[i]*dtoau + dy * dte_3dtoau;
+	loc[2] = object.pos[2] + vz0*alpha[i]*dtoau + dz * dte_3dtoau;
 
 	// Evaluate x_dot_dot
 	get_acc_vector_toff(objects, sim_set, k, alpha[i]*dt, loc, acc);
-	//get_acc_vector(objects, sim_set, k, loc, acc);
 
 	// m/s²
 	fx[i] = acc[0];
@@ -223,9 +223,9 @@ for(i=1; i<n; i++){
 	
 }
 
-pos[0] = object.pos[0] + vx0*dtoau + dte_3 * cifi[0]* dtoau;
-pos[1] = object.pos[1] + vy0*dtoau + dte_3 * cifi[1]* dtoau;
-pos[2] = object.pos[2] + vz0*dtoau + dte_3 * cifi[2]* dtoau;
+pos[0] = object.pos[0] + vx0*dtoau + cifi[0]* dte_3dtoau;
+pos[1] = object.pos[1] + vy0*dtoau + cifi[1]* dte_3dtoau;
+pos[2] = object.pos[2] + vz0*dtoau + cifi[2]* dte_3dtoau;
 
 vel[0] = object.vel[0] + cdotifi[0]*dte_3;
 vel[1] = object.vel[1] + cdotifi[1]*dte_3;
@@ -235,9 +235,9 @@ vel_hat[0] = object.vel[0] + chatifi[0]*dte_3;
 vel_hat[1] = object.vel[1] + chatifi[1]*dte_3;
 vel_hat[2] = object.vel[2] + chatifi[2]*dte_3;
 
-vel_eps[0] = 1.e-3*dt*(-fx[0]/360.+128.*fx[2]/4275.+2197.*fx[3]/75240.-0.02*fx[4]-2.*fx[5]/55.);
-vel_eps[1] = 1.e-3*dt*(-fy[0]/360.+128.*fy[2]/4275.+2197.*fy[3]/75240.-0.02*fy[4]-2.*fy[5]/55.);
-vel_eps[2] = 1.e-3*dt*(-fz[0]/360.+128.*fz[2]/4275.+2197.*fz[3]/75240.-0.02*fz[4]-2.*fz[5]/55.);
+vel_eps[0] = dte_3*(-fx[0]/360.+128.*fx[2]/4275.+2197.*fx[3]/75240.-0.02*fx[4]-2.*fx[5]/55.);
+vel_eps[1] = dte_3*(-fy[0]/360.+128.*fy[2]/4275.+2197.*fy[3]/75240.-0.02*fy[4]-2.*fy[5]/55.);
+vel_eps[2] = dte_3*(-fz[0]/360.+128.*fz[2]/4275.+2197.*fz[3]/75240.-0.02*fz[4]-2.*fz[5]/55.);
 
 
 // Calculate mean error
@@ -326,9 +326,9 @@ double alpha[n];
 double beta[n][n];
 double gamma[n][n];
 
-double cifi[3], cdotifi[3], chatifi[3];
+double cifi[3], cdotifi[3];
 
-double dtoau, dte_3;
+double dtoau, dte_3, dte_3dtoau;
 
 alpha[0] = 0.;
 alpha[1] = 1./12.;
@@ -381,18 +381,11 @@ c_dot[3] = 1./3.;
 c_dot[4] = 125./456.;
 c_dot[5] = 1./15.;
 
-c_hat[0] = c[0];
-c_hat[1] = c[1];
-c_hat[2] = c[2];
-c_hat[3] = 0.;
-c_hat[4] = c[3];
-c_hat[5] = c[4];
-c_hat[6] = c[5];
-
 dt = sim_set->timestep * 86400.; // days -> sec
 dtsq = dt*dt;
 dte_3 = dt*1.e-3;
 dtoau = dt/AU;
+dte_3dtoau = dte_3*dtoau;
 
 for(k=0; k<sim_set->n_bodies; k++){
 
@@ -424,10 +417,6 @@ cifi[2] = c[0]*fz[0];
 cdotifi[0] = c_dot[0]*fx[0];
 cdotifi[1] = c_dot[0]*fy[0];
 cdotifi[2] = c_dot[0]*fz[0];
-
-chatifi[0] = c_hat[0]*fx[0];
-chatifi[1] = c_hat[0]*fy[0];
-chatifi[2] = c_hat[0]*fz[0];
 
 dx=0.;
 dy=0.;
@@ -467,35 +456,24 @@ for(i=1; i<n; i++){
 		cdotifi[1] = cdotifi[1] + fy[i]*c_dot[i];
 		cdotifi[2] = cdotifi[2] + fz[i]*c_dot[i];
 	}
-
-	chatifi[0] = chatifi[0] + fx[i]*c_hat[i];
-	chatifi[1] = chatifi[1] + fy[i]*c_hat[i];
-	chatifi[2] = chatifi[2] + fz[i]*c_hat[i];
 	
 }
 
-pos[0] = object.pos[0] + vx0*dtoau + dte_3 * cifi[0]* dtoau;
-pos[1] = object.pos[1] + vy0*dtoau + dte_3 * cifi[1]* dtoau;
-pos[2] = object.pos[2] + vz0*dtoau + dte_3 * cifi[2]* dtoau;
+pos[0] = object.pos[0] + vx0*dtoau + cifi[0]*dte_3dtoau;
+pos[1] = object.pos[1] + vy0*dtoau + cifi[1]*dte_3dtoau;
+pos[2] = object.pos[2] + vz0*dtoau + cifi[2]*dte_3dtoau;
 
 vel[0] = object.vel[0] + cdotifi[0]*dte_3;
 vel[1] = object.vel[1] + cdotifi[1]*dte_3;
 vel[2] = object.vel[2] + cdotifi[2]*dte_3;
 
-//vel_hat[0] = object.vel[0] + chatifi[0]*dte_3;
-//vel_hat[1] = object.vel[1] + chatifi[1]*dte_3;
-//vel_hat[2] = object.vel[2] + chatifi[2]*dte_3;
-
-pos_eps[0] = 1.e-3*c[5]*dt*dt*(fx[5]-fx[6])/AU;
-pos_eps[1] = 1.e-3*c[5]*dt*dt*(fy[5]-fy[6])/AU;
-pos_eps[2] = 1.e-3*c[5]*dt*dt*(fz[5]-fz[6])/AU;
-
+pos_eps[0] = c[5]*dte_3dtoau*(fx[5]-fx[6]);
+pos_eps[1] = c[5]*dte_3dtoau*(fy[5]-fy[6]);
+pos_eps[2] = c[5]*dte_3dtoau*(fz[5]-fz[6]);
 
 // Calculate mean error
 objects[k].eps_pos = (fabs(pos_eps[0])+fabs(pos_eps[1])+fabs(pos_eps[2]))/3.; 
-
 fe = sim_set->eps_pos_thresh*(fabs(pos[0])+fabs(pos[1])+fabs(pos[2]))/objects[k].eps_pos;
-
 dt_new = sim_set->timestep * fmin(2., fmax(0.2,0.9*sqrt(fe)));
 
 // Check error thresholds
@@ -507,7 +485,6 @@ return 1;
 }
 else{
 // Assign values
-//printf("Assigning ...");
 objects[k].pos_new[0] = pos[0];
 objects[k].pos_new[1] = pos[1];
 objects[k].pos_new[2] = pos[2];
@@ -819,7 +796,7 @@ double alpha[n];
 double beta[n][n];
 double gamma[n][n];
 
-double cifi[3], cdotifi[3], chatifi[3];
+double cifi[3], cdotifi[3];
 
 double dtoau, dte_3, dte_3dtoau;
 
@@ -910,17 +887,6 @@ c_dot[6] = 65./1008.;
 c_dot[7] = 4225./14112.;
 c_dot[8] = 1087./18144.;
 
-c_hat[0] = c[0];
-c_hat[1] = c[1];
-c_hat[2] = c[2];
-c_hat[3] = 0.;
-c_hat[4] = c[3];
-c_hat[5] = c[4];
-c_hat[6] = c[5];
-c_hat[7] = c[6];
-c_hat[8] = c[7];
-c_hat[9] = c[8];
-
 dt = sim_set->timestep * 86400.; // days -> sec
 dtsq = dt*dt;
 dte_3 = dt*1.e-3;
@@ -957,10 +923,6 @@ cifi[2] = c[0]*fz[0];
 cdotifi[0] = c_dot[0]*fx[0];
 cdotifi[1] = c_dot[0]*fy[0];
 cdotifi[2] = c_dot[0]*fz[0];
-
-chatifi[0] = c_hat[0]*fx[0];
-chatifi[1] = c_hat[0]*fy[0];
-chatifi[2] = c_hat[0]*fz[0];
 
 dx=0.;
 dy=0.;
@@ -999,10 +961,6 @@ for(i=1; i<n; i++){
 		cdotifi[1] = cdotifi[1] + fy[i]*c_dot[i];
 		cdotifi[2] = cdotifi[2] + fz[i]*c_dot[i];
 	}
-
-	chatifi[0] = chatifi[0] + fx[i]*c_hat[i];
-	chatifi[1] = chatifi[1] + fy[i]*c_hat[i];
-	chatifi[2] = chatifi[2] + fz[i]*c_hat[i];
 	
 }
 
@@ -1034,6 +992,7 @@ return 1;
 }
 else{
 // Assign values
+//printf("Assigning ...");
 objects[k].pos_new[0] = pos[0];
 objects[k].pos_new[1] = pos[1];
 objects[k].pos_new[2] = pos[2];
