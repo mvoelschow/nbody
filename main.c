@@ -112,7 +112,7 @@ SDL_Color clrRed = {255,0,0,255};
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-window = SDL_CreateWindow(	"nbody 0.1 ALPHA",	// Window title
+window = SDL_CreateWindow(	"nbody 0.1.118 ALPHA",	// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -122,7 +122,7 @@ window = SDL_CreateWindow(	"nbody 0.1 ALPHA",	// Window title
 }
 else{
 
-window = SDL_CreateWindow(	"nbody 0.1 ALPHA",	// Window title
+window = SDL_CreateWindow(	"nbody 0.1.118 ALPHA",	// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
