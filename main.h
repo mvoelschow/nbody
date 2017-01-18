@@ -3,7 +3,7 @@
 
 #define G_cst 6.67408E-11 // SI units
 
-#define PI 3.1415962
+#define PI 3.141592653589793
 
 #define deg_to_rad 0.0174532925199
 #define rad_to_deg 57.29577951308
