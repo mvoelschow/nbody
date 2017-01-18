@@ -373,10 +373,10 @@ SDL_RenderCopy(renderer, cross, NULL, &stretchRect);
 void render_icon(SDL_Renderer *renderer, planet *object, settings *sim_set){
 SDL_Rect stretchRect;
 
-stretchRect.x = object->screen_pos[0] - 0.5*sim_set->icon_size; 
-stretchRect.y = object->screen_pos[1] - 0.5*sim_set->icon_size; 
-stretchRect.w = sim_set->icon_size; 
-stretchRect.h = sim_set->icon_size; 
+stretchRect.x = object->screen_pos[0] - 0.5*object->icon_size; 
+stretchRect.y = object->screen_pos[1] - 0.5*object->icon_size; 
+stretchRect.w = object->icon_size; 
+stretchRect.h = object->icon_size; 
 
 switch(object->icon_num) {
 	case 0: SDL_RenderCopy(renderer, sim_set->icon_sun, NULL, &stretchRect) ; break;
@@ -389,35 +389,6 @@ switch(object->icon_num) {
 
 }
 
-
-
-
-
-void render_icon_size_brightness(SDL_Renderer *renderer, planet *object, settings *sim_set, double size, double brightness){
-SDL_Rect stretchRect;
-SDL_Texture *icon_modified;
-int scale;
-
-stretchRect.x = object->screen_pos[0] - 0.5*size; 
-stretchRect.y = object->screen_pos[1] - 0.5*size; 
-stretchRect.w = size; 
-stretchRect.h = size; 
-
-scale = (int)(255*brightness);
-
-switch(object->icon_num) {
-	case 0: icon_modified = sim_set->icon_sun; break;
-	case 1: icon_modified = sim_set->icon_mercury; break;
-	case 3: icon_modified = sim_set->icon_earth; break;
-	case 5: icon_modified = sim_set->icon_jupiter; break;
-	default: icon_modified = sim_set->icon_sun; break;
-}
-
-SDL_SetTextureColorMod(icon_modified, scale, scale, scale);
-
-SDL_RenderCopy(renderer, icon_modified, NULL, &stretchRect);
-
-}
 
 
 
@@ -455,6 +426,66 @@ else return -1;
 
 
 
+void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set, SDL_Texture *cross){
+int i, i_plot;
+double sin_y_rot, cos_y_rot, sin_x_rot, cos_x_rot;
+
+sin_y_rot = sin(sim_set->y_rot*deg_to_rad);
+cos_y_rot = cos(sim_set->y_rot*deg_to_rad);
+
+sin_x_rot = sin(sim_set->x_rot*deg_to_rad);
+cos_x_rot = cos(sim_set->x_rot*deg_to_rad);
+
+// Get projected distances 
+for(i=0; i<sim_set->n_bodies; i=i+1){
+
+objects[i].z_projected = (-objects[i].pos[0]*cos_x_rot*sin_y_rot+objects[i].pos[1]*sin_x_rot+objects[i].pos[2]*cos_x_rot*cos_y_rot);
+objects[i].plot_order = i;
+
+}
+
+qsort(objects, sim_set->n_bodies, sizeof(objects[0]), compare_structs);
+
+for(i=sim_set->n_bodies; i>=0; i=i-1){
+	i_plot = objects[i].plot_order;
+	render_icon(renderer, &objects[i_plot], sim_set);
+}
+
+}
+
+
+
+
+// For a future release
+/*
+
+void render_icon_size_brightness(SDL_Renderer *renderer, planet *object, settings *sim_set, double size, double brightness){
+SDL_Rect stretchRect;
+SDL_Texture *icon_modified;
+int scale;
+
+stretchRect.x = object->screen_pos[0] - 0.5*size; 
+stretchRect.y = object->screen_pos[1] - 0.5*size; 
+stretchRect.w = size; 
+stretchRect.h = size; 
+
+scale = (int)(255*brightness);
+
+switch(object->icon_num) {
+	case 0: icon_modified = sim_set->icon_sun; break;
+	case 1: icon_modified = sim_set->icon_mercury; break;
+	case 3: icon_modified = sim_set->icon_earth; break;
+	case 5: icon_modified = sim_set->icon_jupiter; break;
+	default: icon_modified = sim_set->icon_sun; break;
+}
+
+SDL_SetTextureColorMod(icon_modified, scale, scale, scale);
+
+SDL_RenderCopy(renderer, icon_modified, NULL, &stretchRect);
+
+}
+
+
 
 void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set, SDL_Texture *cross){
 int i, i_plot;
@@ -486,7 +517,7 @@ for(i=sim_set->n_bodies; i>=0; i=i-1){
 i_plot = objects[i].plot_order;
 d_scale = (objects[i_plot].z_projected) / delta;
 
-icon_size = sim_set->icon_size; // * (1.+d_scale);
+icon_size = objects[i].icon_size; // * (1.+d_scale);
 
 if ( icon_size > sim_set->icon_size_max ) icon_size = sim_set->icon_size_max;
 if ( icon_size < 1. ) icon_size = 1.;
@@ -496,12 +527,14 @@ brightness = 1.;//0.5 * (1. + d_scale);
 if ( brightness < 0.1 ) brightness = 0.1;
 if (brightness > 1. ) brightness = 1.;
 
-		if ( sim_set->icon_mode == 0){
-		render_cross(renderer, cross, sim_set, objects[i_plot].screen_pos[0], objects[i_plot].screen_pos[1]);
-		}
-		else{
-		render_icon_size_brightness(renderer, &objects[i_plot], sim_set, icon_size, brightness);
-		}
+if ( sim_set->icon_mode == 0){
+	render_cross(renderer, cross, sim_set, objects[i_plot].screen_pos[0], objects[i_plot].screen_pos[1]);
 	}
+	else{
+	render_icon_size_brightness(renderer, &objects[i_plot], sim_set, objects[i].icon_size, brightness);
+
+	}
+}
 
 }
+*/
