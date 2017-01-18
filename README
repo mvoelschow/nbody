@@ -18,3 +18,5 @@ Current release: 0.1.118 ALPHA
 18.01.2017:   - Adaptive RKN78 integrator implemented
               - VSYNC switch added
               - Integrator switch added
+              - Object icon (Sun, Mercury, Earth, Jupiter) can be specified for every single body
+              - Object icon size can be customized in the init_bodies procedure
