@@ -147,7 +147,7 @@ renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED); // VSYNC OFF
 // ***********************************************************
 
 // Load body icons
-load_object_textures(renderer, objects, &sim_set);
+load_object_textures(renderer, &sim_set);
 
 
 // Load background bitmap
