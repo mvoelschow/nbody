@@ -3,9 +3,12 @@
 ######################################################################################
 
 nbody is a simple n-body code written in C and utilizing the SDL2 library for graphical
-output, making it a nice tool to run interactive n-body simulations for scientific or 
+output, making it a nice tool to run interactive n-body simulations for both scientific and 
 educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
 Current release: 0.1.118 ALPHA
+
+### Changelog ###
+18.01.2017:   Adaptive RKN78 integrator implemented
