@@ -52,7 +52,6 @@ int screenshot_trigger;
 int output_counter;
 double zoom_factor;
 int icon_mode;
-double icon_size;
 double icon_size_max;
 int vsync;
 int integrator;
@@ -85,6 +84,7 @@ double select_box_x[2];
 double select_box_y[2];
 int ident;
 int icon_num;
+double icon_size;
 } planet;
 
 
