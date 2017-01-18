@@ -56,6 +56,10 @@ double icon_size;
 double icon_size_max;
 int vsync;
 int integrator;
+SDL_Texture *icon_sun;
+SDL_Texture *icon_jupiter;
+SDL_Texture *icon_earth;
+SDL_Texture *icon_mercury;
 } settings;
 
 
@@ -80,7 +84,7 @@ double mass;
 double select_box_x[2];
 double select_box_y[2];
 int ident;
-SDL_Texture *icon;
+int icon_num;
 } planet;
 
 
@@ -112,7 +116,7 @@ void Generate_Output_File( planet objects[], settings *sim_set );
 void create_screenshot(SDL_Renderer *renderer, settings *sim_set);
 void create_auto_screenshot(SDL_Renderer *renderer, settings *sim_set);
 void Draw_Background(SDL_Renderer *renderer, SDL_Texture *background, settings *sim_set);
-void load_object_textures(SDL_Renderer *renderer, planet objects[], settings *sim_set);
+void load_object_textures(SDL_Renderer *renderer, settings *sim_set);
 int processEvents(SDL_Window *window, settings *sim_set, planet objects[]);
 void render_all_bodies(SDL_Renderer *renderer, planet objects[], settings *sim_set, SDL_Texture *cross);
 void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set, SDL_Texture *cross);
