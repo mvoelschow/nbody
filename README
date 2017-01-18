@@ -11,4 +11,10 @@ Author: Marcel Völschow, Hamburg Observatory
 Current release: 0.1.118 ALPHA
 
 ### Changelog ###
-18.01.2017:   Adaptive RKN78 integrator implemented
+04.01.2017:   - nbody 0.1 ALPHA released
+11.01.2017:   - Adaptive RKN56 integrator implemented
+12.01.2017:   - Adaptive RKN67 integrator implemented
+14.01.2017:   - Various RKN45, RKN56 and RKN67 cleanups
+18.01.2017:   - Adaptive RKN78 integrator implemented
+              - VSYNC switch added
+              - Integrator switch added
