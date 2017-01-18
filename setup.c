@@ -23,6 +23,7 @@ double randomDouble(){
 // ***********************************************************
 void init_settings(settings *sim_set){
 
+      
 // *******************************
 // Total number of particles to simulate
 // *******************************
@@ -30,14 +31,22 @@ sim_set->n_bodies = 200;
 
 
 // *******************************
+// Numerics
+// *******************************
+
+// Integrator order {4,5,6,7}
+sim_set->integrator = 7;
+
+// Maximum relative error per step for position and velocity
+sim_set->eps_vel_thresh = 1.E-10;
+sim_set->eps_pos_thresh = 1.E-10;
+
+      
+// *******************************
 // Time settings
 // *******************************
-// Maximum relative error per step for position and velocity
-sim_set->eps_vel_thresh = 1.E-11;
-sim_set->eps_pos_thresh = 1.E-12;
 
 // Largest simulation timestep [days]
-// Should be a power of 2
 sim_set->timestep_max = 100.;
 
 // Time at which the simulation ends [days]
@@ -71,6 +80,9 @@ sim_set->icon_size_max = 20;
 
 // Draw background
 sim_set->draw_background = 1;
+
+// VSYNC on/off (framerate cap at 60 FPS)
+sim_set->vsync = 0;
 
 
 // *******************************
