@@ -112,7 +112,7 @@ SDL_Color clrRed = {255,0,0,255};
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-window = SDL_CreateWindow(	"n-body 0.1 ALPHA",	// Window title
+window = SDL_CreateWindow(	"nbody 0.1 ALPHA",	// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -122,7 +122,7 @@ window = SDL_CreateWindow(	"n-body 0.1 ALPHA",	// Window title
 }
 else{
 
-window = SDL_CreateWindow(	"n-body 0.1 ALPHA",	// Window title
+window = SDL_CreateWindow(	"nbody 0.1 ALPHA",	// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -132,8 +132,12 @@ window = SDL_CreateWindow(	"n-body 0.1 ALPHA",	// Window title
 }
 
 // Initialize renderer ( VSYNC ON/OFF)
+if ( sim_set.vsync == 1 ){
 renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // VSYNC ON
-//renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED); // VSYNC OFF
+}
+else{
+renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED); // VSYNC OFF
+}
 
 
 
@@ -191,7 +195,15 @@ Draw_Background(renderer, background, &sim_set);
 
 // Update bodies
 if ( sim_set.paused != 1 ){
-adaptive_rkn45_step(objects, &sim_set);
+
+	switch(sim_set.integrator) {
+		case 4: adaptive_rkn45_step(objects, &sim_set); break;
+		case 5: adaptive_rkn56_step(objects, &sim_set); break;
+		case 6: adaptive_rkn67_step(objects, &sim_set); break;
+		case 7: adaptive_rkn78_step(objects, &sim_set); break;
+		default: adaptive_rkn45_step(objects, &sim_set); break;
+	}
+
 }
 else{
 render_paused(renderer, fntCourier, &sim_set);
