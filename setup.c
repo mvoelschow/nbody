@@ -70,12 +70,6 @@ sim_set->scale_min = 0.1;
 // Largest scale setting [AU]
 sim_set->scale_max = 100.;
 
-// Size of body icons [pixels]
-sim_set->icon_size = 10;
-
-// Maximum icon size in pseudo 3D rendering mode
-sim_set->icon_size_max = 20;
-
 // Draw background
 sim_set->draw_background = 1;
 
@@ -118,7 +112,8 @@ sim_set->x_rot = 0.;
 sim_set->y_rot = 0.;
 sim_set->timestep_lock = 0;
 sim_set->timestep_factor = 1.1;
-
+sim_set->icon_size_max = 20;
+      
 }
 
 
@@ -139,11 +134,13 @@ double p_orb, r_planet;
 objects[0].ident = 0;
 objects[0].mass = M_SUN;
 objects[0].icon_num = 0;
+objects[0].icon_size = 16;
 
 // Massive planet
 objects[1].ident = 1;
 objects[1].mass = 1.E-2*M_SUN;
 objects[1].icon_num = 5;
+objects[1].icon_size = 8;
 
 r_planet = 6.; // [au]
 
@@ -176,6 +173,7 @@ for(i=2; i<sim_set->n_bodies; i=i+1){
 // Set body mass [kg]
 objects[i].mass = 1.E19*(99.*randomDouble()+1.);
 objects[i].icon_num = 1;
+objects[i].icon_size = 4;
 
 r = 2+3.*randomDouble();
 phi = randomDouble()*2.*PI;
