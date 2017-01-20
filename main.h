@@ -69,11 +69,17 @@ typedef struct
 char label[8];
 double pos[3];
 double vel[3];
+// Numerical stuff
 double pos_new[3];
 double vel_new[3];
-double acc[3];
+double cifi[3];
+double cdotifi[3];
+double chatifi[3];
+double d[3];
 double eps_pos;
 double eps_vel;
+
+double acc[3];
 double screen_pos[2];
 double alpha, delta;
 double screen_size, size;
@@ -104,10 +110,10 @@ void zoom_out_at_mouse_position(settings *sim_set);
 void zoom_in_at_mouse_position(settings *sim_set);
 
 // From num.c
-void adaptive_rkn45_step(planet objects[], settings *sim_set);
+//void adaptive_rkn45_step(planet objects[], settings *sim_set);
 void adaptive_rkn56_step(planet objects[], settings *sim_set);
-void adaptive_rkn67_step(planet objects[], settings *sim_set);
-void adaptive_rkn78_step(planet objects[], settings *sim_set);
+//void adaptive_rkn67_step(planet objects[], settings *sim_set);
+//void adaptive_rkn78_step(planet objects[], settings *sim_set);
 
 // From output.c
 void Generate_Output_File( planet objects[], settings *sim_set );

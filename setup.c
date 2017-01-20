@@ -26,19 +26,19 @@ void init_settings(settings *sim_set){
 // *******************************
 // Total number of particles to simulate
 // *******************************
-sim_set->n_bodies = 200;
+sim_set->n_bodies = 2;
 
 
 // *******************************
 // Numerics
 // *******************************
 
-// Integrator order {4,5,6,7}
-sim_set->integrator = 7;
+// Integrator order {5}
+sim_set->integrator = 5;
 
 // Maximum relative error per step for position and velocity
-sim_set->eps_vel_thresh = 1.E-10;
-sim_set->eps_pos_thresh = 1.E-10;
+sim_set->eps_vel_thresh = 1.E-12;
+sim_set->eps_pos_thresh = 1.E-12;
 
 // *******************************
 // Time settings
@@ -205,151 +205,3 @@ objects[i].ident = i;
 }
 
 }
-
-/*
-void init_bodies(planet objects[], settings *sim_set){
-int i;
-double r, r_max, phi;
-
-r_max = 3.*PC;
-
-for(i=0; i<sim_set->n_bodies; i=i+1){
-
-// Set body mass [kg]
-objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
-
-r = randomDouble()*r_max;
-phi = randomDouble()*2.*PI;
-
-// Set body position [AU]
-// x component
-objects[i].pos[0] = r*cos(phi);
-// y component
-objects[i].pos[1] = r*sin(phi);
-// z component
-objects[i].pos[2] = 1.*PC*(2.*randomDouble()-1.);
-
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = 0.01*(2.*randomDouble()-1.);
-// y component
-objects[i].vel[1] = 0.01*(2.*randomDouble()-1.);
-// z component
-objects[i].vel[2] = 0.01*(2.*randomDouble()-1.);
-
-
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
-
-}
-
-}
-
-*/
-
-
-
-// ***********************************************************
-// Template for two filaments of stars
-// ***********************************************************
-/*
-void init_bodies(planet objects[], settings *sim_set){
-int i;
-
-for(i=0; i<sim_set->n_bodies/2; i=i+1){
-
-// Set body mass [kg]
-objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
-
-// Set body position [AU]
-// x component
-objects[i].pos[0] = 7.*PC*(2.*randomDouble()-1.);
-// y component
-objects[i].pos[1] = 1.5*PC+0.7*PC*(2.*randomDouble()-1.);
-// z component
-objects[i].pos[2] = 0.7*PC*(2.*randomDouble()-1.);
-
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = 0.01*(2.*randomDouble()-1.);
-// y component
-objects[i].vel[1] = 0.01*(2.*randomDouble()-1.);
-// z component
-objects[i].vel[2] = 0.01*(2.*randomDouble()-1.);
-
-
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
-
-}
-
-for(i=sim_set->n_bodies/2; i<sim_set->n_bodies; i=i+1){
-
-// Set body mass [kg]
-objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
-
-// Set body position [AU]
-// x component
-objects[i].pos[0] = 7.*PC*(2.*randomDouble()-1.);
-// y component
-objects[i].pos[1] = 0.7*PC*(2.*randomDouble()-1.) - 1.5*PC;
-// z component
-objects[i].pos[2] = 0.7*PC*(2.*randomDouble()-1.);
-
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = 0.01*(2.*randomDouble()-1.);
-// y component
-objects[i].vel[1] = 0.01*(2.*randomDouble()-1.);
-// z component
-objects[i].vel[2] = 0.01*(2.*randomDouble()-1.);
-
-
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
-
-}
-
-}
-*/
-
-
-
-
-
-// ***********************************************************
-// Template for a single filament of stars
-// ***********************************************************
-/*
-void init_bodies(planet objects[], settings *sim_set){
-int i;
-
-for(i=0; i<sim_set->n_bodies; i=i+1){
-
-// Set body mass [kg]
-objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
-
-// Set body position [AU]
-// x component
-objects[i].pos[0] = 7.*PC*(2.*randomDouble()-1.);
-// y component
-objects[i].pos[1] = 0.7*PC*(2.*randomDouble()-1.);
-// z component
-objects[i].pos[2] = 0.7*PC*(2.*randomDouble()-1.);
-
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = 0.01*(2.*randomDouble()-1.);
-// y component
-objects[i].vel[1] = 0.01*(2.*randomDouble()-1.);
-// z component
-objects[i].vel[2] = 0.01*(2.*randomDouble()-1.);
-
-
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
-
-}
-
-}
-*/

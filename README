@@ -3,20 +3,28 @@
 ######################################################################################
 
 nbody is a simple n-body code written in C and utilizing the SDL2 library for graphical
-output, making it a nice tool to run interactive n-body simulations for both scientific and 
+output, making it a handy tool to run interactive n-body simulations for both scientific and 
 educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.1.118 ALPHA
+Current release: 0.1.120 ALPHA
 
 ### Changelog ###
-04.01.2017:   - nbody 0.1 ALPHA released
-11.01.2017:   - Adaptive RKN56 integrator implemented
-12.01.2017:   - Adaptive RKN67 integrator implemented
-14.01.2017:   - Various RKN45, RKN56 and RKN67 cleanups
-18.01.2017:   - Adaptive RKN78 integrator implemented
-              - VSYNC switch added
-              - Integrator switch added
-              - Object icon (Sun, Mercury, Earth, Jupiter) can be specified for every single body
-              - Object icon size can be customized in the init_bodies procedure
+04.01.2017:   	- nbody 0.1 ALPHA released
+
+18.01.2017:   	- VSYNC switch added
+              	- Integrator switch added
+              	- Object icon (Sun, Mercury, Earth, Jupiter) can be specified for every single body
+              	- Object icon size can be customized in the init_bodies procedure
+
+20.01.2017:	- RKN5(6) implemented (stability tests pending)
+
+### How to get started ###
+Download the repository zip, unpack the archive, open a terminal and type "make".
+The GNU C compiler gcc, SDL2 and SDL2_ttf must be present.
+
+### Running a simulation ###
+At this very early stage of the project, the simulation setup is hard-coded. 
+The program calls the "init_bodies" routine that can be found and modified 
+in the setup.c file. 

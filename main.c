@@ -197,11 +197,11 @@ Draw_Background(renderer, background, &sim_set);
 if ( sim_set.paused != 1 ){
 
 	switch(sim_set.integrator) {
-		case 4: adaptive_rkn45_step(objects, &sim_set); break;
+//		case 4: adaptive_rkn45_step(objects, &sim_set); break;
 		case 5: adaptive_rkn56_step(objects, &sim_set); break;
-		case 6: adaptive_rkn67_step(objects, &sim_set); break;
-		case 7: adaptive_rkn78_step(objects, &sim_set); break;
-		default: adaptive_rkn45_step(objects, &sim_set); break;
+//		case 6: adaptive_rkn67_step(objects, &sim_set); break;
+//		case 7: adaptive_rkn78_step(objects, &sim_set); break;
+		default: adaptive_rkn56_step(objects, &sim_set); break;
 	}
 
 }

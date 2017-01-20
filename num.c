@@ -12,10 +12,15 @@
 
 
 // t_off in sec
-void get_acc_vector_toff(planet objects[], settings *sim_set, int skip_id, double t_off, double loc[3], double acc[]){
+void get_acc_vector(planet objects[], settings *sim_set, int skip_id, double acc[]){
 // loc in AU, acc in m/s²
 int i;
 double a_x, a_y, a_z, dist, delta[3], GModist, kAU;
+double loc[3];
+
+loc[0] = objects[skip_id].pos_new[0];
+loc[1] = objects[skip_id].pos_new[1];
+loc[2] = objects[skip_id].pos_new[2];
 
 //omp_set_num_threads(2);
 
@@ -35,11 +40,10 @@ continue;
 }
 
 // AU->m
-delta[0] = kAU*(objects[i].pos[0] + t_off*objects[i].vel[0]/AU - loc[0]);
-delta[1] = kAU*(objects[i].pos[1] + t_off*objects[i].vel[1]/AU - loc[1]);
-delta[2] = kAU*(objects[i].pos[2] + t_off*objects[i].vel[2]/AU - loc[2]);
+delta[0] = kAU*(objects[i].pos_new[0] - loc[0]);
+delta[1] = kAU*(objects[i].pos_new[1] - loc[1]);
+delta[2] = kAU*(objects[i].pos_new[2] - loc[2]);
 
-// 2D distance !!!!
 // m
 dist = sqrt( delta[0]*delta[0] + delta[1]*delta[1] + delta[2]*delta[2]) ;
 
@@ -60,6 +64,244 @@ acc[2] = a_z;
 
 
 
+int rkn56_step(planet objects[], settings *sim_set){
+
+planet object;
+
+int i, j, k, l;
+const int n=7;
+
+double vx0, vy0, vz0, dx, dy, dz;
+double acc[3], loc[3], dt, dtsq;
+double vel[3], pos[3], vel_hat[3];
+double vel_eps[3], pos_eps[3];
+
+double fx[sim_set->n_bodies][n];
+double fy[sim_set->n_bodies][n];
+double fz[sim_set->n_bodies][n];
+
+double c[n];
+double c_dot[n];
+double c_hat[n];
+double fe, dt_new, dt_new_guess;
+
+double alpha[n];
+double beta[n][n];
+double gamma[n][n];
+
+double dtoau, dte_3, dte_3dtoau;
+
+dt_new = 1.e100;
+
+alpha[0] = 0.;
+alpha[1] = 1./12.;
+alpha[2] = 1./6.;
+alpha[3] = 0.5;
+alpha[4] = 0.8;
+alpha[5] = 1.;
+alpha[6] = 1.;
+
+gamma[0][0] = 0.;
+
+gamma[1][0] = 1./288.;
+
+gamma[2][0] = 1./216.;
+gamma[2][1] = 1./108.;
+
+gamma[3][0] = 0.;
+gamma[3][1] = 0.;
+gamma[3][2] = 0.125;
+
+gamma[4][0] = 16./125.;
+gamma[4][1] = 0.;
+gamma[4][2] = 4./125.;
+gamma[4][3] = 4./25.;
+
+gamma[5][0] = -247./1152.;
+gamma[5][1] = 0.;
+gamma[5][2] = 12./19.;
+gamma[5][3] = 7./432.;
+gamma[5][4] = 4375./65664.;
+
+gamma[6][0] = 11./240.;
+gamma[6][1] = 0.;
+gamma[6][2] = 108./475.;
+gamma[6][3] = 8./45.;
+gamma[6][4] = 125./2736.;
+gamma[6][5] = 1./300.;
+
+c[0] = gamma[6][0];
+c[1] = 0.;
+c[2] = gamma[6][2];
+c[3] = gamma[6][3];
+c[4] = gamma[6][4];
+c[5] = gamma[6][5];
+
+c_dot[0] = 1./24.;
+c_dot[1] = 0.;
+c_dot[2] = 27./95.;
+c_dot[3] = 1./3.;
+c_dot[4] = 125./456.;
+c_dot[5] = 1./15.;
+
+dt = sim_set->timestep * 86400.; // days -> sec
+dtsq = dt*dt;
+dte_3 = dt*1.e-3;
+dtoau = dt/AU;
+dte_3dtoau = dte_3*dtoau;
+
+// Step 1: Initial values
+for(k=0; k<sim_set->n_bodies; k++){
+
+	// AU
+	objects[k].pos_new[0] = objects[k].pos[0];
+	objects[k].pos_new[1] = objects[k].pos[1];
+	objects[k].pos_new[2] = objects[k].pos[2];
+
+	// m/s² for all three blocks
+	objects[k].cifi[0] = 0;
+	objects[k].cifi[1] = 0;
+	objects[k].cifi[2] = 0;
+
+	objects[k].cdotifi[0] = 0;
+	objects[k].cdotifi[1] = 0;
+	objects[k].cdotifi[2] = 0;
+
+	objects[k].d[0]=0.;
+	objects[k].d[1]=0.;
+	objects[k].d[2]=0.;
+
+}
+
+// Calculate f_i values
+for(i=0; i<n; i++){
+
+	// Assign positions for the i-th evaluation of the acceleration function
+	for(k=0; k<sim_set->n_bodies; k++){
+
+		for(j=0; j<i; j++){
+			// m/s²
+			objects[k].d[0] += gamma[i][j]*fx[k][j];
+			objects[k].d[1] += gamma[i][j]*fy[k][j];
+			objects[k].d[2] += gamma[i][j]*fz[k][j];
+		}
+
+		// AU
+		objects[k].pos_new[0] = objects[k].pos[0] + objects[k].vel[0]*alpha[i]*dtoau + dte_3 * objects[k].d[0] * dtoau;
+		objects[k].pos_new[1] = objects[k].pos[1] + objects[k].vel[1]*alpha[i]*dtoau + dte_3 * objects[k].d[1] * dtoau;
+		objects[k].pos_new[2] = objects[k].pos[2] + objects[k].vel[2]*alpha[i]*dtoau + dte_3 * objects[k].d[2] * dtoau;
+
+	}
+
+	// Evaluate the acceleration function for all particles 
+	for(k=0; k<sim_set->n_bodies; k++){
+
+		get_acc_vector(objects, sim_set, k, acc);
+
+		// m/s²
+		fx[k][i] = acc[0];
+		fy[k][i] = acc[1];
+		fz[k][i] = acc[2];
+
+		// Increment the interaction sums
+		if(i<n-1){
+			// m/s² for all three blocks
+			objects[k].cifi[0] += fx[k][i]*c[i];
+			objects[k].cifi[1] += fy[k][i]*c[i];
+			objects[k].cifi[2] += fz[k][i]*c[i];
+	
+			objects[k].cdotifi[0] += fx[k][i]*c_dot[i];
+			objects[k].cdotifi[1] += fy[k][i]*c_dot[i];
+			objects[k].cdotifi[2] += fz[k][i]*c_dot[i];
+		}
+	
+	}
+
+}
+
+// Store new positions in temporary variables and calculate the truncation error estimate
+for(k=0; k<sim_set->n_bodies; k++){
+
+	// AU
+	pos[0] = objects[k].pos[0] + objects[k].vel[0]*dtoau + objects[k].cifi[0]*dte_3dtoau;
+	pos[1] = objects[k].pos[1] + objects[k].vel[1]*dtoau + objects[k].cifi[1]*dte_3dtoau;
+	pos[2] = objects[k].pos[2] + objects[k].vel[2]*dtoau + objects[k].cifi[2]*dte_3dtoau;
+
+	// km/s
+	vel[0] = objects[k].vel[0] + objects[k].cdotifi[0]*dte_3;
+	vel[1] = objects[k].vel[1] + objects[k].cdotifi[1]*dte_3;
+	vel[2] = objects[k].vel[2] + objects[k].cdotifi[2]*dte_3;
+
+	// Positional truncation error
+	pos_eps[0] = c[5]*dte_3dtoau*(fx[k][5]-fx[k][6]);
+	pos_eps[1] = c[5]*dte_3dtoau*(fy[k][5]-fy[k][6]);
+	pos_eps[2] = c[5]*dte_3dtoau*(fz[k][5]-fz[k][6]);
+
+	// Calculate mean error
+	objects[k].eps_pos = (fabs(pos_eps[0])+fabs(pos_eps[1])+fabs(pos_eps[2]))/3.; 
+	fe = sim_set->eps_pos_thresh*(fabs(pos[0])+fabs(pos[1])+fabs(pos[2]))/objects[k].eps_pos;
+	dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*sqrt(fe)));
+
+	// Chose the smallest timestep estimate for the next step
+	if ( dt_new_guess < dt_new ) dt_new = dt_new_guess;
+
+	// Check error thresholds
+	if( fe < 1. ){
+		// Chose new timestep
+		sim_set->timestep = dt_new;
+		// Indicate that no new position and velocity values have been output
+		return 1;
+	}
+	else{
+		// Assign values to temporary variable
+		objects[k].pos_new[0] = pos[0];
+		objects[k].pos_new[1] = pos[1];
+		objects[k].pos_new[2] = pos[2];
+
+		objects[k].vel_new[0] = vel[0];
+		objects[k].vel_new[1] = vel[1];
+		objects[k].vel_new[2] = vel[2];
+	}
+
+}
+
+// All particles passed the error check. Assign new values to final variable
+for(k=0;k<sim_set->n_bodies;k++){
+objects[k].pos[0] = objects[k].pos_new[0];
+objects[k].pos[1] = objects[k].pos_new[1];
+objects[k].pos[2] = objects[k].pos_new[2];
+
+objects[k].vel[0] = objects[k].vel_new[0];
+objects[k].vel[1] = objects[k].vel_new[1];
+objects[k].vel[2] = objects[k].vel_new[2];
+}
+
+// Increment timestep counter
+sim_set->timestep_counter = sim_set->timestep_counter + 1;
+// Increment time according to old timestep
+sim_set->time = sim_set->time + sim_set->timestep;
+// Update timestep
+sim_set->timestep = dt_new;
+return 0;
+
+}
+
+
+
+void adaptive_rkn56_step(planet objects[], settings *sim_set){
+int check;
+check=1;
+
+check = rkn56_step(objects, sim_set);
+
+}
+
+
+
+
+
+// To be updated
+/*
 
 int rkn45_step(planet objects[], settings *sim_set){
 
@@ -297,233 +539,6 @@ int check;
 check=1;
 
 check = rkn45_step(objects, sim_set);
-
-}
-
-
-int rkn56_step(planet objects[], settings *sim_set){
-
-planet object;
-
-int i, j, k, l;
-const int n=7;
-
-double vx0, vy0, vz0, dx, dy, dz;
-double acc[3], loc[3], dt, dtsq;
-double vel[3], pos[3], vel_hat[3];
-double vel_eps[3], pos_eps[3];
-
-double fx[n];
-double fy[n];
-double fz[n];
-
-double c[n];
-double c_dot[n];
-double c_hat[n];
-double fe, dt_new;
-
-double alpha[n];
-double beta[n][n];
-double gamma[n][n];
-
-double cifi[3], cdotifi[3];
-
-double dtoau, dte_3, dte_3dtoau;
-
-alpha[0] = 0.;
-alpha[1] = 1./12.;
-alpha[2] = 1./6.;
-alpha[3] = 0.5;
-alpha[4] = 0.8;
-alpha[5] = 1.;
-alpha[6] = 1.;
-
-gamma[0][0] = 0.;
-
-gamma[1][0] = 1./288.;
-
-gamma[2][0] = 1./216.;
-gamma[2][1] = 1./108.;
-
-gamma[3][0] = 0.;
-gamma[3][1] = 0.;
-gamma[3][2] = 0.125;
-
-gamma[4][0] = 16./125.;
-gamma[4][1] = 0.;
-gamma[4][2] = 4./125.;
-gamma[4][3] = 4./25.;
-
-gamma[5][0] = -247./1152.;
-gamma[5][1] = 0.;
-gamma[5][2] = 12./19.;
-gamma[5][3] = 7./432.;
-gamma[5][4] = 4375./65664.;
-
-gamma[6][0] = 11./240.;
-gamma[6][1] = 0.;
-gamma[6][2] = 108./475.;
-gamma[6][3] = 8./45.;
-gamma[6][4] = 125./2736.;
-gamma[6][5] = 1./300.;
-
-c[0] = gamma[6][0];
-c[1] = 0.;
-c[2] = gamma[6][2];
-c[3] = gamma[6][3];
-c[4] = gamma[6][4];
-c[5] = gamma[6][5];
-
-c_dot[0] = 1./24.;
-c_dot[1] = 0.;
-c_dot[2] = 27./95.;
-c_dot[3] = 1./3.;
-c_dot[4] = 125./456.;
-c_dot[5] = 1./15.;
-
-dt = sim_set->timestep * 86400.; // days -> sec
-dtsq = dt*dt;
-dte_3 = dt*1.e-3;
-dtoau = dt/AU;
-dte_3dtoau = dte_3*dtoau;
-
-for(k=0; k<sim_set->n_bodies; k++){
-
-object = objects[k];
-
-// Step 1: Initial values
-// AU
-loc[0] = object.pos[0];
-loc[1] = object.pos[1];
-loc[2] = object.pos[2];
-
-// km/s
-vx0 = object.vel[0];
-vy0 = object.vel[1];
-vz0 = object.vel[2];
-
-// m/s²
-get_acc_vector_toff(objects, sim_set, k, 0., loc, acc);
-fx[0] = acc[0];
-fy[0] = acc[1];
-fz[0] = acc[2];
-
-
-// m/s² for all three blocks
-cifi[0] = c[0]*fx[0];
-cifi[1] = c[0]*fy[0];
-cifi[2] = c[0]*fz[0];
-
-cdotifi[0] = c_dot[0]*fx[0];
-cdotifi[1] = c_dot[0]*fy[0];
-cdotifi[2] = c_dot[0]*fz[0];
-
-dx=0.;
-dy=0.;
-dz=0.;
-
-// Calculate f_i values
-for(i=1; i<n; i++){
-
-	for(j=0; j<i; j++){
-		// m/s²
-		dx = dx + gamma[i][j]*fx[j];
-		dy = dy + gamma[i][j]*fy[j];
-		dz = dz + gamma[i][j]*fz[j];
-	}
-
-	// AU
-	loc[0] = object.pos[0] + vx0*alpha[i]*dtoau + dte_3 * dx * dtoau;
-	loc[1] = object.pos[1] + vy0*alpha[i]*dtoau + dte_3 * dy * dtoau;
-	loc[2] = object.pos[2] + vz0*alpha[i]*dtoau + dte_3 * dz * dtoau;
-
-	// Evaluate x_dot_dot
-	get_acc_vector_toff(objects, sim_set, k, alpha[i]*dt, loc, acc);
-	//get_acc_vector(objects, sim_set, k, loc, acc);
-
-	// m/s²
-	fx[i] = acc[0];
-	fy[i] = acc[1];
-	fz[i] = acc[2];
-
-	// m/s² for all three blocks
-	if(i<n-1){
-		cifi[0] = cifi[0] + fx[i]*c[i];
-		cifi[1] = cifi[1] + fy[i]*c[i];
-		cifi[2] = cifi[2] + fz[i]*c[i];
-	
-		cdotifi[0] = cdotifi[0] + fx[i]*c_dot[i];
-		cdotifi[1] = cdotifi[1] + fy[i]*c_dot[i];
-		cdotifi[2] = cdotifi[2] + fz[i]*c_dot[i];
-	}
-	
-}
-
-pos[0] = object.pos[0] + vx0*dtoau + cifi[0]*dte_3dtoau;
-pos[1] = object.pos[1] + vy0*dtoau + cifi[1]*dte_3dtoau;
-pos[2] = object.pos[2] + vz0*dtoau + cifi[2]*dte_3dtoau;
-
-vel[0] = object.vel[0] + cdotifi[0]*dte_3;
-vel[1] = object.vel[1] + cdotifi[1]*dte_3;
-vel[2] = object.vel[2] + cdotifi[2]*dte_3;
-
-pos_eps[0] = c[5]*dte_3dtoau*(fx[5]-fx[6]);
-pos_eps[1] = c[5]*dte_3dtoau*(fy[5]-fy[6]);
-pos_eps[2] = c[5]*dte_3dtoau*(fz[5]-fz[6]);
-
-// Calculate mean error
-objects[k].eps_pos = (fabs(pos_eps[0])+fabs(pos_eps[1])+fabs(pos_eps[2]))/3.; 
-fe = sim_set->eps_pos_thresh*(fabs(pos[0])+fabs(pos[1])+fabs(pos[2]))/objects[k].eps_pos;
-dt_new = sim_set->timestep * fmin(2., fmax(0.2,0.9*sqrt(fe)));
-
-// Check error thresholds
-if( fe < 1. ){
-// Chose new timestep
-sim_set->timestep = dt_new;
-// Indicate that no new position and velocity values have been output
-return 1;
-}
-else{
-// Assign values
-objects[k].pos_new[0] = pos[0];
-objects[k].pos_new[1] = pos[1];
-objects[k].pos_new[2] = pos[2];
-
-objects[k].vel_new[0] = vel[0];
-objects[k].vel_new[1] = vel[1];
-objects[k].vel_new[2] = vel[2];
-
-}
-
-}
-
-for(k=0;k<sim_set->n_bodies;k++){
-objects[k].pos[0] = objects[k].pos_new[0];
-objects[k].pos[1] = objects[k].pos_new[1];
-objects[k].pos[2] = objects[k].pos_new[2];
-
-objects[k].vel[0] = objects[k].vel_new[0];
-objects[k].vel[1] = objects[k].vel_new[1];
-objects[k].vel[2] = objects[k].vel_new[2];
-}
-
-// Increment timestep counter
-sim_set->timestep_counter = sim_set->timestep_counter + 1;
-// Increment time according to old timestep
-sim_set->time = sim_set->time + sim_set->timestep;
-// Update timestep
-sim_set->timestep = dt_new;
-return 0;
-
-}
-
-
-
-void adaptive_rkn56_step(planet objects[], settings *sim_set){
-int check;
-check=1;
-
-check = rkn56_step(objects, sim_set);
 
 }
 
@@ -1034,3 +1049,7 @@ check=1;
 check = rkn78_step(objects, sim_set);
 
 }
+
+
+*/
+
