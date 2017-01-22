@@ -37,12 +37,14 @@ int paused;
 int finished;
 double eps_vel_thresh;
 double eps_pos_thresh;
+double E_tot_0;
+double E_tot;
+double delta_E_thresh;
+int check_delta_E;
 double center_screen_x, center_screen_y;
 double start_x, start_y;
 double end_x, end_y;
 double size_factor;
-double cross_size;
-double cross_thresh;
 double select_box_size;
 int selected_object;
 int auto_screenshot;
@@ -111,12 +113,14 @@ void zoom_in_at_mouse_position(settings *sim_set);
 
 // From num.c
 //void adaptive_rkn45_step(planet objects[], settings *sim_set);
+double get_total_energy(planet objects[], settings *sim_set);
 void adaptive_rkn56_step(planet objects[], settings *sim_set);
 //void adaptive_rkn67_step(planet objects[], settings *sim_set);
 //void adaptive_rkn78_step(planet objects[], settings *sim_set);
 
 // From output.c
 void Generate_Output_File( planet objects[], settings *sim_set );
+void Write_Numerical_Stats(settings *sim_set);
 
 // From sdl.c
 void create_screenshot(SDL_Renderer *renderer, settings *sim_set);
@@ -124,8 +128,8 @@ void create_auto_screenshot(SDL_Renderer *renderer, settings *sim_set);
 void Draw_Background(SDL_Renderer *renderer, SDL_Texture *background, settings *sim_set);
 void load_object_textures(SDL_Renderer *renderer, settings *sim_set);
 int processEvents(SDL_Window *window, settings *sim_set, planet objects[]);
-void render_all_bodies(SDL_Renderer *renderer, planet objects[], settings *sim_set, SDL_Texture *cross);
-void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set, SDL_Texture *cross);
+void render_all_bodies(SDL_Renderer *renderer, planet objects[], settings *sim_set);
+void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set);
 void Render_Screen(SDL_Renderer *renderer);
 
 // From setup.c

@@ -26,7 +26,7 @@ void init_settings(settings *sim_set){
 // *******************************
 // Total number of particles to simulate
 // *******************************
-sim_set->n_bodies = 2;
+sim_set->n_bodies = 400;
 
 
 // *******************************
@@ -37,8 +37,12 @@ sim_set->n_bodies = 2;
 sim_set->integrator = 5;
 
 // Maximum relative error per step for position and velocity
-sim_set->eps_vel_thresh = 1.E-12;
-sim_set->eps_pos_thresh = 1.E-12;
+sim_set->eps_vel_thresh = 1.E-14;
+sim_set->eps_pos_thresh = 1.E-14;
+
+// Maximum relative deviation from the system's initial energy budget
+sim_set->check_delta_E = 1;
+sim_set->delta_E_thresh = 0.01;
 
 // *******************************
 // Time settings
@@ -48,7 +52,7 @@ sim_set->eps_pos_thresh = 1.E-12;
 sim_set->timestep_max = 100.;
 
 // Time at which the simulation ends [days]
-sim_set->time_end = 1.E3*YR;
+sim_set->time_end = 1.E4*YR;
 
 
 // *******************************
@@ -107,7 +111,6 @@ sim_set->screenshot_trigger = 1;
 sim_set->output_counter = 0;
 sim_set->time_output = 0.;
 sim_set->timestep_counter = 0;
-sim_set->cross_size = 10;
 sim_set->x_rot = 0.;
 sim_set->y_rot = 0.;
 sim_set->timestep_lock = 0;
@@ -175,7 +178,7 @@ objects[i].mass = 1.E19*(99.*randomDouble()+1.);
 objects[i].icon_num = 1;
 objects[i].icon_size = 4;
 
-r = 2+3.*randomDouble();
+r = 3+2.*randomDouble();
 phi = randomDouble()*2.*PI;
 
 // Set body position [AU]

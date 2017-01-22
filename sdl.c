@@ -76,17 +76,6 @@ sim_set->paused = 0;
 }
 
 
-void switch_icon_mode(settings *sim_set){
-
-if ( sim_set->icon_mode == 0 ){
-sim_set->icon_mode = 1;
-}
-else{
-sim_set->icon_mode = 0;
-}
-
-}
-
 
 
 int processEvents(SDL_Window *window, settings *sim_set, planet objects[]){
@@ -97,99 +86,94 @@ int delay, x, y;
 int delta_x, delta_y;
 int i;
 
-	while(SDL_PollEvent(&event))
-	{
-		switch(event.type)
-		{
-			case SDL_WINDOWEVENT_CLOSE:
+while(SDL_PollEvent(&event)){
+
+	switch(event.type){
+
+		case SDL_WINDOWEVENT_CLOSE:
 			{
-				if(window){
+			if(window){
 				SDL_DestroyWindow(window);
 				window = NULL;
 				done = 1;
-				}
+			}
 			}
 			break;
 
-			case SDL_KEYDOWN:
+		case SDL_KEYDOWN:
 			{
-				switch(event.key.keysym.sym)
-				{
-					case SDLK_KP_PLUS:
+			switch(event.key.keysym.sym){
+				case SDLK_KP_PLUS:
 					if( 2.*sim_set->timestep <= sim_set->timestep_max ){
 						sim_set->timestep = sim_set->timestep * 2.;
 					}
-					break;
+				break;
 
-					case SDLK_KP_MINUS:
+				case SDLK_KP_MINUS:
 					sim_set->timestep = sim_set->timestep * 0.5;
-					break;
+				break;
 
-					case SDLK_c:
+				case SDLK_c:
 					sim_set->center_screen_x = 0.5*sim_set->res_x;
 					sim_set->center_screen_y = 0.5*sim_set->res_y;
-					break;
+				break;
 
-					case SDLK_DOWN:
+				case SDLK_DOWN:
 					sim_set->x_rot = sim_set->x_rot-1.;
-					break;
+				break;
 
-					case SDLK_UP:
+				case SDLK_UP:
 					sim_set->x_rot = sim_set->x_rot+1.;
-					break;
+				break;
 
-					case SDLK_RIGHT:
+				case SDLK_RIGHT:
 					sim_set->y_rot = sim_set->y_rot+1.;
-					break;
+				break;
 
-					case SDLK_LEFT:
+				case SDLK_LEFT:
 					sim_set->y_rot = sim_set->y_rot-1.;
-					break;
+				break;
 
-					case SDLK_n:
+				case SDLK_n:
 					sim_set->x_rot = 0.;
 					sim_set->y_rot = 0.;
-					break;
+				break;
 
-					case SDLK_ESCAPE:
+				case SDLK_ESCAPE:
 					done = 1;
-					break;
+				break;
 
-					case SDLK_SPACE:
+				case SDLK_SPACE:
 					switch_pause_mode(sim_set);
-					break;
+				break;
 
-					case SDLK_a:
+				case SDLK_a:
 					switch_timestep_mode(sim_set);
-					break;
+				break;
 
-					case SDLK_s:
+				case SDLK_s:
 					sim_set->screenshot_trigger = 1;
-					break;
+				break;
 
-					case SDLK_i:
-					switch_icon_mode(sim_set);
-					break;
-
-					case SDLK_PAGEUP:
+				case SDLK_PAGEUP:
 					zoom_in(sim_set);						
-					break;
+				break;
 
-					case SDLK_PAGEDOWN:
+				case SDLK_PAGEDOWN:
 					zoom_out(sim_set);	
-					break;	
-				}
+				break;	
 			}
-			break;
+		}
+		break;
 
-			case SDL_MOUSEWHEEL:
+		case SDL_MOUSEWHEEL:
 			{
 			
 			if ( event.wheel.y > 0 ){
-			zoom_in_at_mouse_position(sim_set);		
+				zoom_in_at_mouse_position(sim_set);		
 			}
 			else{
-			zoom_out_at_mouse_position(sim_set);
+				zoom_out_at_mouse_position(sim_set);
 			}
 			}
 			break;
@@ -209,11 +193,8 @@ int i;
 
 			}
 
-			if( event.button.button == SDL_BUTTON_RIGHT){
-
-			// Reset selection
-			sim_set->selected_object = -1;
-			
+			if( event.button.state == SDL_PRESSED &&  event.button.button == SDL_BUTTON_RIGHT && sim_set->selected_object == -1){
+			printf("event!!");
 			// Get mouse position
 			SDL_GetMouseState( &x, &y );
 
@@ -223,6 +204,10 @@ int i;
 				if( x >= objects[i].select_box_x[0] && x <= objects[i].select_box_x[1] && y >= objects[i].select_box_y[0] && y <= objects[i].select_box_y[1]){
 				sim_set->selected_object = i;
 				break;
+				}
+				else{
+					// Reset selection
+					sim_set->selected_object = -1;
 				}
 
 				}
@@ -355,21 +340,6 @@ load_texture(renderer, &sim_set->icon_mercury, "sprites/mercury_icon.bmp");
 
 
 
-void render_cross(SDL_Renderer *renderer, SDL_Texture *cross, settings *sim_set, double screen_x, double screen_y){
-SDL_Rect stretchRect;
-
-stretchRect.x = screen_x - 0.5*sim_set->cross_size; 
-stretchRect.y = screen_y - 0.5*sim_set->cross_size; 
-stretchRect.w = sim_set->cross_size; 
-stretchRect.h = sim_set->cross_size; 
-
-SDL_RenderCopy(renderer, cross, NULL, &stretchRect);
-
-}
-
-
-
-
 void render_icon(SDL_Renderer *renderer, planet *object, settings *sim_set){
 SDL_Rect stretchRect;
 
@@ -393,18 +363,12 @@ switch(object->icon_num) {
 
 
 
-void render_all_bodies(SDL_Renderer *renderer, planet objects[], settings *sim_set, SDL_Texture *cross){
+void render_all_bodies(SDL_Renderer *renderer, planet objects[], settings *sim_set){
 int i;
 
 for(i=0; i<sim_set->n_bodies; i=i+1){
-
-		if ( sim_set->icon_mode == 0){
-		render_cross(renderer, cross, sim_set, objects[i].screen_pos[0], objects[i].screen_pos[1]);
-		}
-		else{
-		render_icon(renderer, &objects[i], sim_set);
-		}
-	}
+	render_icon(renderer, &objects[i], sim_set);
+}
 
 }
 
@@ -426,7 +390,7 @@ else return -1;
 
 
 
-void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set, SDL_Texture *cross){
+void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set){
 int i, i_plot;
 double sin_y_rot, cos_y_rot, sin_x_rot, cos_x_rot;
 

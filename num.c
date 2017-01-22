@@ -10,6 +10,48 @@
 
 
 
+double get_total_energy(planet objects[], settings *sim_set){
+int i, j;
+double e_kin, e_pot, e_sum, v_abs, dist, dx, dy, dz, kAU;
+
+kAU = 1.E3*AU;
+e_sum = 0;
+
+for(i=0; i<sim_set->n_bodies; i++){
+
+	// Kinetic energy
+	v_abs = 1.e3*sqrt(objects[i].vel[0]*objects[i].vel[0]+objects[i].vel[1]*objects[i].vel[1]+objects[i].vel[2]*objects[i].vel[2]); // m/s
+	e_kin = 0.5*objects[i].mass*v_abs*v_abs; // Joules
+	e_pot = 0.;
+
+	for(j=0; j<sim_set->n_bodies;j++){
+
+		if( i==j ) continue;
+
+		// AU->m
+		dx = kAU*(objects[i].pos[0] - objects[j].pos[0]);
+		dy = kAU*(objects[i].pos[1] - objects[j].pos[1]);
+		dz = kAU*(objects[i].pos[2] - objects[j].pos[2]);
+
+		// m
+		dist = sqrt( dx*dx + dy*dy + dz*dz);
+
+		// Joules
+		e_pot += -G_cst * objects[i].mass * objects[j].mass / dist;
+
+	}
+
+e_sum += e_kin + e_pot;
+
+}
+
+return e_sum;
+
+}
+
+
+
+
 
 // t_off in sec
 void get_acc_vector(planet objects[], settings *sim_set, int skip_id, double acc[]){

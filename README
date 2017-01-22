@@ -8,7 +8,7 @@ educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.1.120 ALPHA
+Current release: 0.1.123 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -19,6 +19,11 @@ Current release: 0.1.120 ALPHA
               	- Object icon size can be customized in the init_bodies procedure
 
 20.01.2017:	- RKN5(6) implemented (stability tests pending)
+
+22.01.2017:	- Total energy conservation check implemented
+		- High CPU load in pause mode bug fixed
+
+23.01.2017:	- Numerical stats output implemented 
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".

@@ -12,7 +12,7 @@ FILE *ofp;
 int i;
 
 // Generate filename
-sprintf(path, "output_%d.dat", sim_set->output_counter); // puts string into buffer
+sprintf(path, "output_%d.dat", sim_set->output_counter);
 
 // Get pointer to file
 ofp = fopen(path, "w");
@@ -30,13 +30,32 @@ fprintf(ofp, "%e", sim_set->time/YR);
 fprintf(ofp, " yr \n");
 
 for (i=0; i<sim_set->n_bodies; i++){
-fprintf(ofp, "%i %e %e %e %e %e %e %e \n", objects[i].ident, objects[i].mass/M_SUN, objects[i].pos[0], objects[i].pos[1], objects[i].pos[2], objects[i].vel[0], objects[i].vel[1], objects[i].vel[2] );
+fprintf(ofp, "%i %le %le %le %le %le %le %le \n", objects[i].ident, objects[i].mass/M_SUN, objects[i].pos[0], objects[i].pos[1], objects[i].pos[2], objects[i].vel[0], objects[i].vel[1], objects[i].vel[2] );
 }
 
-/*Schliesse Datei*/
+// Close file
 fclose (ofp);      
 
 sim_set->output_counter = sim_set->output_counter + 1;
 sim_set->time_output = sim_set->time_output + sim_set->output_interval;
+
+}
+
+
+
+void Write_Numerical_Stats(settings *sim_set){
+FILE *ofp; 
+
+// Get pointer to file
+ofp = fopen("stat_num.dat", "a");
+if (ofp == NULL) {
+  fprintf(stderr, "Can't open output file stat_num.dat!");
+  exit(1);
+}
+
+fprintf(ofp, "%i %le %le %le \n", sim_set->timestep_counter, sim_set->time/365.25, sim_set->E_tot, fabs((sim_set->E_tot-sim_set->E_tot_0)/sim_set->E_tot_0));
+
+// Close file
+fclose (ofp);      
 
 }

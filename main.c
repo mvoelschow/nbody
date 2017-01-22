@@ -38,9 +38,6 @@ SDL_Renderer *renderer;		// Declare a renderer
 SDL_Texture *background;
 SDL_Surface *background_surf;
 
-SDL_Texture *cross;
-SDL_Surface *cross_surf;
-
 int done = 0;
 int i;
 double delta_t;
@@ -76,6 +73,11 @@ objects = (planet *)malloc(sizeof(planet)*sim_set.n_bodies);
 init_bodies(objects, &sim_set);
 
 
+// ***********************************************************
+//   Calculate initial energy
+// ***********************************************************
+sim_set.E_tot_0 = get_total_energy(objects, &sim_set);
+sim_set.E_tot = sim_set.E_tot_0;
 
 
 // ***********************************************************
@@ -112,7 +114,7 @@ SDL_Color clrRed = {255,0,0,255};
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-window = SDL_CreateWindow(	"nbody 0.1.118 ALPHA",	// Window title
+window = SDL_CreateWindow(	"nbody 0.1.122 ALPHA",	// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -122,7 +124,7 @@ window = SDL_CreateWindow(	"nbody 0.1.118 ALPHA",	// Window title
 }
 else{
 
-window = SDL_CreateWindow(	"nbody 0.1.118 ALPHA",	// Window title
+window = SDL_CreateWindow(	"nbody 0.1.123 ALPHA",	// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -162,20 +164,6 @@ background = SDL_CreateTextureFromSurface(renderer, background_surf);
 SDL_FreeSurface(background_surf);
 
 
-// Load cross bitmap
-cross_surf = SDL_LoadBMP("sprites/cross.bmp");
-
-if(cross_surf==NULL){
-printf("Error. Cross hair bitmap not found.");
-SDL_Quit();
-}
-
-SDL_SetColorKey( cross_surf, SDL_TRUE, SDL_MapRGB(cross_surf->format,255, 0, 255) ); 
-cross = SDL_CreateTextureFromSurface(renderer, cross_surf);
-
-SDL_FreeSurface(cross_surf);
-
-
 
 
 // ***********************************************************
@@ -213,7 +201,7 @@ render_paused(renderer, fntCourier, &sim_set);
 get_planar_screen_coordinates(objects,&sim_set);
 
 // Render objects
-render_all_bodies_3D(renderer, objects, &sim_set, cross);
+render_all_bodies_3D(renderer, objects, &sim_set);
 
 // Some HUD
 // Scale setting
@@ -233,8 +221,14 @@ Render_Screen(renderer);
 
 // Check if automatic output is scheduled
 if ( sim_set.paused != 1 && sim_set.time >= sim_set.time_output ) {
-generate_auto_output(renderer, objects, &sim_set);
-sim_set.time_output += sim_set.output_interval;
+	
+	if ( sim_set.check_delta_E == 1 ){
+		sim_set.E_tot = get_total_energy(objects, &sim_set);
+		Write_Numerical_Stats(&sim_set);
+	}
+
+	generate_auto_output(renderer, objects, &sim_set);
+	sim_set.time_output += sim_set.output_interval;
 }
 
 
@@ -247,13 +241,21 @@ create_screenshot(renderer, &sim_set);
 if ( sim_set.paused == 0 ) {
 
 	if ( sim_set.time >= sim_set.time_end && sim_set.finished == 0 ){
-	sim_set.finished = 1;
-	sim_set.paused = 1;
+		sim_set.finished = 1;
+		sim_set.paused = 1;
+	}
+
+	if ( fabs((sim_set.E_tot-sim_set.E_tot_0)/sim_set.E_tot_0) > sim_set.delta_E_thresh ){
+		sim_set.finished = 1;
+		sim_set.paused = 1;
 	}
 
 }
 
+if ( sim_set.paused == 1 ) SDL_Delay(200);
+
 }
+
 
 // Unload fond
 TTF_CloseFont( fntCourier );
