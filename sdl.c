@@ -190,9 +190,9 @@ while(SDL_PollEvent(&event)){
 				sim_set->start_y = y;
 
 			}
-
+			/*
 			if( event.button.state == SDL_PRESSED && event.button.button == SDL_BUTTON_RIGHT && sim_set->selected_object == -1){
-
+			
 				// Get mouse position
 				SDL_GetMouseState( &x, &y );
 
@@ -212,7 +212,7 @@ while(SDL_PollEvent(&event)){
 
 
 			}
-
+			*/
 
 			}
 			break;
