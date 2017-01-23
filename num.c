@@ -201,10 +201,6 @@ for(k=0; k<sim_set->n_bodies; k++){
 	objects[k].cdotifi[1] = 0;
 	objects[k].cdotifi[2] = 0;
 
-	objects[k].d[0]=0.;
-	objects[k].d[1]=0.;
-	objects[k].d[2]=0.;
-
 }
 
 // Calculate f_i values
@@ -213,6 +209,10 @@ for(i=0; i<n; i++){
 	// Assign positions for the i-th evaluation of the acceleration function
 	for(k=0; k<sim_set->n_bodies; k++){
 
+		objects[k].d[0]=0.;
+		objects[k].d[1]=0.;
+		objects[k].d[2]=0.;	
+		
 		for(j=0; j<i; j++){
 			// m/s²
 			objects[k].d[0] += gamma[i][j]*fx[k][j];
