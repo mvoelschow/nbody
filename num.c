@@ -52,8 +52,6 @@ return e_sum;
 
 
 
-
-// t_off in sec
 void get_acc_vector(planet objects[], settings *sim_set, int skip_id, double acc[]){
 // loc in AU, acc in m/s²
 int i;
@@ -108,15 +106,12 @@ acc[2] = a_z;
 
 int rkn56_step(planet objects[], settings *sim_set){
 
-planet object;
-
-int i, j, k, l;
+int i, j, k;
 const int n=7;
 
-double vx0, vy0, vz0, dx, dy, dz;
-double acc[3], loc[3], dt, dtsq;
-double vel[3], pos[3], vel_hat[3];
-double vel_eps[3], pos_eps[3];
+double acc[3], dt;
+double vel[3], pos[3];
+double pos_eps[3];
 
 double fx[sim_set->n_bodies][n];
 double fy[sim_set->n_bodies][n];
@@ -124,11 +119,9 @@ double fz[sim_set->n_bodies][n];
 
 double c[n];
 double c_dot[n];
-double c_hat[n];
 double fe, dt_new, dt_new_guess;
 
 double alpha[n];
-double beta[n][n];
 double gamma[n][n];
 
 double dtoau, dte_3, dte_3dtoau;
@@ -187,7 +180,6 @@ c_dot[4] = 125./456.;
 c_dot[5] = 1./15.;
 
 dt = sim_set->timestep * 86400.; // days -> sec
-dtsq = dt*dt;
 dte_3 = dt*1.e-3;
 dtoau = dt/AU;
 dte_3dtoau = dte_3*dtoau;
@@ -331,12 +323,11 @@ return 0;
 
 
 void adaptive_rkn56_step(planet objects[], settings *sim_set){
-int check;
-check=1;
 
-check = rkn56_step(objects, sim_set);
+rkn56_step(objects, sim_set);
 
 }
+
 
 
 

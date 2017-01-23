@@ -115,8 +115,6 @@ void zoom_in_at_mouse_position(settings *sim_set);
 //void adaptive_rkn45_step(planet objects[], settings *sim_set);
 double get_total_energy(planet objects[], settings *sim_set);
 void adaptive_rkn56_step(planet objects[], settings *sim_set);
-//void adaptive_rkn67_step(planet objects[], settings *sim_set);
-//void adaptive_rkn78_step(planet objects[], settings *sim_set);
 
 // From output.c
 void Generate_Output_File( planet objects[], settings *sim_set );

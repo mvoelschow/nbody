@@ -24,6 +24,7 @@ Current release: 0.1.123 ALPHA
 		- High CPU load in pause mode bug fixed
 
 23.01.2017:	- Numerical stats output implemented 
+		- Code cleanups
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".

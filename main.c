@@ -39,16 +39,12 @@ SDL_Texture *background;
 SDL_Surface *background_surf;
 
 int done = 0;
-int i;
-double delta_t;
 
 // Misc
 settings sim_set;
 
 planet *objects;
 
-double scale;
-double time_step;
 
 // Initialize random number generator
 srand(time(NULL));
@@ -105,10 +101,6 @@ if (TTF_Init() != 0){
 
 // Open font file
 TTF_Font *fntCourier = TTF_OpenFont( "fonts/HighlandGothicFLF.ttf", 36 );
-
-// Define colors
-SDL_Color clrWhite = {255,255,255,255}; 
-SDL_Color clrRed = {255,0,0,255}; 
 
 
 // Create an application window
@@ -185,10 +177,7 @@ Draw_Background(renderer, background, &sim_set);
 if ( sim_set.paused != 1 ){
 
 	switch(sim_set.integrator) {
-//		case 4: adaptive_rkn45_step(objects, &sim_set); break;
 		case 5: adaptive_rkn56_step(objects, &sim_set); break;
-//		case 6: adaptive_rkn67_step(objects, &sim_set); break;
-//		case 7: adaptive_rkn78_step(objects, &sim_set); break;
 		default: adaptive_rkn56_step(objects, &sim_set); break;
 	}
 

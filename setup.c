@@ -26,7 +26,7 @@ void init_settings(settings *sim_set){
 // *******************************
 // Total number of particles to simulate
 // *******************************
-sim_set->n_bodies = 400;
+sim_set->n_bodies = 2;
 
 
 // *******************************
@@ -37,8 +37,8 @@ sim_set->n_bodies = 400;
 sim_set->integrator = 5;
 
 // Maximum relative error per step for position and velocity
-sim_set->eps_vel_thresh = 1.E-14;
-sim_set->eps_pos_thresh = 1.E-14;
+sim_set->eps_vel_thresh = 1.E-10;
+sim_set->eps_pos_thresh = 1.E-10;
 
 // Maximum relative deviation from the system's initial energy budget
 sim_set->check_delta_E = 1;
@@ -52,7 +52,7 @@ sim_set->delta_E_thresh = 0.01;
 sim_set->timestep_max = 100.;
 
 // Time at which the simulation ends [days]
-sim_set->time_end = 1.E4*YR;
+sim_set->time_end = 1.E2*YR;
 
 
 // *******************************

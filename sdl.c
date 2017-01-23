@@ -45,7 +45,6 @@ sim_set->output_counter++;
 
 
 void switch_timestep_mode(settings *sim_set){
-int i;
 
 if ( sim_set->auto_timestep == 0 ){
 sim_set->auto_timestep = 1;
@@ -81,8 +80,7 @@ sim_set->paused = 0;
 int processEvents(SDL_Window *window, settings *sim_set, planet objects[]){
 SDL_Event event;
 int done=0;
-double scale, timestep;
-int delay, x, y;
+int x, y;
 int delta_x, delta_y;
 int i;
 
@@ -179,36 +177,36 @@ while(SDL_PollEvent(&event)){
 			break;
 			
 
-			case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONDOWN:
 			{
 
 			if( event.button.state == SDL_PRESSED && event.button.button == SDL_BUTTON_LEFT){
 
-			// Get mouse position
-			SDL_GetMouseState( &x, &y );
+				// Get mouse position
+				SDL_GetMouseState( &x, &y );
 
-			// Save mouse position at mouse click start
-			sim_set->start_x = x;
-			sim_set->start_y = y;
+				// Save mouse position at mouse click start
+				sim_set->start_x = x;
+				sim_set->start_y = y;
 
 			}
 
-			if( event.button.state == SDL_PRESSED &&  event.button.button == SDL_BUTTON_RIGHT && sim_set->selected_object == -1){
-			printf("event!!");
-			// Get mouse position
-			SDL_GetMouseState( &x, &y );
+			if( event.button.state == SDL_PRESSED && event.button.button == SDL_BUTTON_RIGHT && sim_set->selected_object == -1){
+
+				// Get mouse position
+				SDL_GetMouseState( &x, &y );
 
 				// Check if a planet was clicked
 				for (i=0;i<sim_set->n_bodies;i++){
 
-				if( x >= objects[i].select_box_x[0] && x <= objects[i].select_box_x[1] && y >= objects[i].select_box_y[0] && y <= objects[i].select_box_y[1]){
-				sim_set->selected_object = i;
-				break;
-				}
-				else{
-					// Reset selection
-					sim_set->selected_object = -1;
-				}
+					if( x >= objects[i].select_box_x[0] && x <= objects[i].select_box_x[1] && y >= objects[i].select_box_y[0] && y <= objects[i].select_box_y[1]){
+						sim_set->selected_object = i;
+						break;
+					}
+					else{
+						// Reset selection
+						sim_set->selected_object = -1;
+					}
 
 				}
 
@@ -220,24 +218,24 @@ while(SDL_PollEvent(&event)){
 			break;
 
 
-			case SDL_MOUSEBUTTONUP:
+		case SDL_MOUSEBUTTONUP:
 			{
 
 			if( event.button.state == SDL_RELEASED && event.button.button == SDL_BUTTON_LEFT ){
 
-			// Get mouse position
-			SDL_GetMouseState( &x, &y );
+				// Get mouse position
+				SDL_GetMouseState( &x, &y );
 
-			// Assign position to settings type
-			sim_set->end_x = x;
-			sim_set->end_y = y;
+				// Assign position to settings type
+				sim_set->end_x = x;
+				sim_set->end_y = y;
 
-			// calculate motion delta
-			delta_x = sim_set->start_x-sim_set->end_x;
-			delta_y = sim_set->start_y-sim_set->end_y;			
+				// calculate motion delta
+				delta_x = sim_set->start_x-sim_set->end_x;
+				delta_y = sim_set->start_y-sim_set->end_y;			
 
-			sim_set->center_screen_x = sim_set->center_screen_x - delta_x;
-			sim_set->center_screen_y = sim_set->center_screen_y - delta_y;		
+				sim_set->center_screen_x = sim_set->center_screen_x - delta_x;
+				sim_set->center_screen_y = sim_set->center_screen_y - delta_y;		
 
 			}
 
@@ -245,16 +243,12 @@ while(SDL_PollEvent(&event)){
 			break;
 
 
-
-			case SDL_QUIT:
+		case SDL_QUIT:
 			done = 1;
 			break;
-			}
-
 	}
 
-	const Uint8 *state = SDL_GetKeyboardState(NULL);
-
+}
 
 return done;
 
@@ -324,7 +318,6 @@ SDL_FreeSurface(img_surf);
 
 
 void load_object_textures(SDL_Renderer *renderer, settings *sim_set){
-int i;
 
 load_texture(renderer, &sim_set->icon_sun, "sprites/sun_icon.bmp");
 load_texture(renderer, &sim_set->icon_jupiter, "sprites/jupiter_icon.bmp");

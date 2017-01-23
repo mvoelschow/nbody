@@ -17,8 +17,6 @@ int i;
 double scale_factor;
 double center_x, center_y;
 double x,y,z;
-double size;
-double screen_size;
 double sin_y_rot, cos_y_rot, sin_x_rot, cos_x_rot;
 
 sin_y_rot = sin(sim_set->y_rot*deg_to_rad);
@@ -37,8 +35,6 @@ y = objects[i].pos[1];
 z = objects[i].pos[2];
 
 scale_factor = sim_set->res_x/sim_set->scale;
-size = objects[i].size/AU;
-screen_size = size*scale_factor*sim_set->size_factor;
 
 objects[i].screen_pos[0] = center_x + scale_factor*x*cos_y_rot+scale_factor*z*sin_y_rot;
 objects[i].screen_pos[1] = center_y + scale_factor*x*sin_x_rot*sin_y_rot+scale_factor*y*cos_x_rot-scale_factor*z*sin_x_rot*cos_y_rot; 
@@ -57,11 +53,9 @@ objects[i].select_box_y[1] = objects[i].screen_pos[1] + 0.5 * sim_set->select_bo
 
 
 void zoom_in_at_mouse_position(settings *sim_set){
-double scale, scale_new;
-double center_angle;
+double scale_new;
 double x, y, scale_factor;
 double x_new, y_new, scale_factor_new;
-double delta_x, delta_y;
 int mx,my;
 
 if ( sim_set->scale > sim_set->scale_min ){
@@ -94,11 +88,9 @@ sim_set->center_screen_y -= (y-y_new)*scale_factor_new;
 
 
 void zoom_out_at_mouse_position(settings *sim_set){
-double scale, scale_new;
-double center_angle;
+double scale_new;
 double x, y, scale_factor;
 double x_new, y_new, scale_factor_new;
-double delta_x, delta_y;
 int mx,my;
 
 if ( sim_set->scale < sim_set->scale_max ){
@@ -132,11 +124,9 @@ sim_set->center_screen_y -= (y-y_new)*scale_factor_new;
 
 
 void zoom_out(settings *sim_set){
-double scale, scale_new;
-double center_angle;
+double scale_new;
 double x, y, scale_factor;
 double x_new, y_new, scale_factor_new;
-double delta_x, delta_y;
 
 if ( sim_set->scale < sim_set->scale_max ){
 
@@ -167,11 +157,9 @@ sim_set->center_screen_y -= (y-y_new)*scale_factor_new;
 
 
 void zoom_in(settings *sim_set){
-double scale, scale_new;
-double center_angle;
+double scale_new;
 double x, y, scale_factor;
 double x_new, y_new, scale_factor_new;
-double delta_x, delta_y;
 
 
 if ( sim_set->scale > sim_set->scale_min ){
@@ -460,7 +448,6 @@ if ( sim_set->auto_timestep == 1 ) render_text(renderer, "AUTO", 10, sim_set->re
 
 
 void render_time_information(SDL_Renderer *renderer, TTF_Font *fntCourier, settings *sim_set){
-SDL_Rect stretchRect;
 SDL_Color clrWhite = {255,255,255,255}; 
 
 render_text(renderer, "Simulated time", 10, 0, 160, 40, clrWhite, fntCourier);
