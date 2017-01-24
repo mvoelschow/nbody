@@ -45,7 +45,7 @@ sim_set->check_delta_E = 1;
 sim_set->delta_E_thresh = 0.01;
 
 // Timestep smoothing. Improves performance at the cost of some precision loss
-sim_set->timestep_smoothing = 1;
+sim_set->timestep_smoothing = 5.;
 
 
 // *******************************

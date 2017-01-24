@@ -241,11 +241,11 @@ for(k=0; k<sim_set->n_bodies; k++){
 		}
 	}
 
-	if ( sim_set->timestep_smoothing == 0 ){
+	if ( sim_set->timestep_smoothing < 1. ){
 		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*fe_min));
 	}
 	else{
-		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*pow(fe_min, 0.2)));
+		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*pow(fe_min, 1./sim_set->timestep_smoothing)));
 	}
 
 	// Chose the smallest timestep estimate for the next step

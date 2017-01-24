@@ -31,7 +31,7 @@ double scale_min, scale_max, scale_step;
 double time;
 double time_end;
 double timestep_max;
-int timestep_smoothing;
+double timestep_smoothing;
 double time_output;
 double output_interval;
 int paused;
