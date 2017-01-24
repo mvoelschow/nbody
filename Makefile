@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -O3 -lm `sdl2-config --cflags --libs` -lSDL2_ttf
+CFLAGS = -Wall -march=native -O3 -lm `sdl2-config --cflags --libs` -lSDL2_ttf
 NAME = nbody
 
 programs: nbody
