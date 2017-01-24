@@ -9,6 +9,28 @@
 
 
 
+void clear_numerics(planet objects[], settings *sim_set){
+int k;
+
+for(k=0; k<sim_set->n_bodies; k++){
+
+	objects[k].cifi[0] = 0;
+	objects[k].cifi[1] = 0;
+	objects[k].cifi[2] = 0;
+
+	objects[k].cdotifi[0] = 0;
+	objects[k].cdotifi[1] = 0;
+	objects[k].cdotifi[2] = 0;
+
+	objects[k].d[0] = 0.;
+	objects[k].d[1] = 0.;
+	objects[k].d[2] = 0.;
+
+}
+
+}
+
+
 
 double get_total_energy(planet objects[], settings *sim_set){
 int i, j;
@@ -109,7 +131,7 @@ int rkn56_step(planet objects[], settings *sim_set){
 int i, j, k;
 const int n=7;
 
-double acc[3], dt;
+double acc[3];
 double vel[3], pos[3];
 double pos_eps[3];
 
@@ -117,91 +139,25 @@ double fx[sim_set->n_bodies][n];
 double fy[sim_set->n_bodies][n];
 double fz[sim_set->n_bodies][n];
 
-double c[n];
-double c_dot[n];
-double fe, dt_new, dt_new_guess;
+const double c[6]={11./240., 0., 108./475., 8./45., 125./2736., 1./300.};
+const double c_dot[6]={1./24., 0., 27./95., 1./3., 125./456., 1./15.};
+double fe[3], fe_min, dt_new, dt_new_guess;
 
-double alpha[n];
-double gamma[n][n];
+const double alpha[7]={0., 1./12., 1./6., 0.5, 0.8, 1., 1.};
+const double gamma[7][6]={	{0., 0., 0., 0., 0., 0.},
+				{1./288., 0., 0., 0., 0., 0.},
+				{1./216., 1./108., 0., 0., 0., 0.},
+				{0., 0., 0.125, 0., 0., 0.},
+				{16./125., 0., 4./125., 4./25., 0., 0.},
+				{-247./1152., 0., 12./19., 7./432., 4375./65664., 0.},
+				{11./240., 0., 108./475., 8./45., 125./2736., 1./300. } };
 
-double dtoau, dte_3, dte_3dtoau;
+const double dt=sim_set->timestep * 86400.;
+const double dtoau=dt/AU, dte_3=dt*1.e-3, dte_3dtoau=dte_3*dtoau;
+const double c5dte_3dtoau = c[5]*dte_3dtoau;
 
+// Just some crazy high initial guess
 dt_new = 1.e100;
-
-alpha[0] = 0.;
-alpha[1] = 1./12.;
-alpha[2] = 1./6.;
-alpha[3] = 0.5;
-alpha[4] = 0.8;
-alpha[5] = 1.;
-alpha[6] = 1.;
-
-gamma[0][0] = 0.;
-
-gamma[1][0] = 1./288.;
-
-gamma[2][0] = 1./216.;
-gamma[2][1] = 1./108.;
-
-gamma[3][0] = 0.;
-gamma[3][1] = 0.;
-gamma[3][2] = 0.125;
-
-gamma[4][0] = 16./125.;
-gamma[4][1] = 0.;
-gamma[4][2] = 4./125.;
-gamma[4][3] = 4./25.;
-
-gamma[5][0] = -247./1152.;
-gamma[5][1] = 0.;
-gamma[5][2] = 12./19.;
-gamma[5][3] = 7./432.;
-gamma[5][4] = 4375./65664.;
-
-gamma[6][0] = 11./240.;
-gamma[6][1] = 0.;
-gamma[6][2] = 108./475.;
-gamma[6][3] = 8./45.;
-gamma[6][4] = 125./2736.;
-gamma[6][5] = 1./300.;
-
-c[0] = gamma[6][0];
-c[1] = 0.;
-c[2] = gamma[6][2];
-c[3] = gamma[6][3];
-c[4] = gamma[6][4];
-c[5] = gamma[6][5];
-
-c_dot[0] = 1./24.;
-c_dot[1] = 0.;
-c_dot[2] = 27./95.;
-c_dot[3] = 1./3.;
-c_dot[4] = 125./456.;
-c_dot[5] = 1./15.;
-
-dt = sim_set->timestep * 86400.; // days -> sec
-dte_3 = dt*1.e-3;
-dtoau = dt/AU;
-dte_3dtoau = dte_3*dtoau;
-
-// Step 1: Initial values
-for(k=0; k<sim_set->n_bodies; k++){
-
-	// AU
-	objects[k].pos_new[0] = objects[k].pos[0];
-	objects[k].pos_new[1] = objects[k].pos[1];
-	objects[k].pos_new[2] = objects[k].pos[2];
-
-	// m/s² for all three blocks
-	objects[k].cifi[0] = 0;
-	objects[k].cifi[1] = 0;
-	objects[k].cifi[2] = 0;
-
-	objects[k].cdotifi[0] = 0;
-	objects[k].cdotifi[1] = 0;
-	objects[k].cdotifi[2] = 0;
-
-}
 
 // Calculate f_i values
 for(i=0; i<n; i++){
@@ -221,9 +177,9 @@ for(i=0; i<n; i++){
 		}
 
 		// AU
-		objects[k].pos_new[0] = objects[k].pos[0] + objects[k].vel[0]*alpha[i]*dtoau + dte_3 * objects[k].d[0] * dtoau;
-		objects[k].pos_new[1] = objects[k].pos[1] + objects[k].vel[1]*alpha[i]*dtoau + dte_3 * objects[k].d[1] * dtoau;
-		objects[k].pos_new[2] = objects[k].pos[2] + objects[k].vel[2]*alpha[i]*dtoau + dte_3 * objects[k].d[2] * dtoau;
+		objects[k].pos_new[0] = objects[k].pos[0] + objects[k].vel[0]*alpha[i]*dtoau + objects[k].d[0]*dte_3dtoau;
+		objects[k].pos_new[1] = objects[k].pos[1] + objects[k].vel[1]*alpha[i]*dtoau + objects[k].d[1]*dte_3dtoau;
+		objects[k].pos_new[2] = objects[k].pos[2] + objects[k].vel[2]*alpha[i]*dtoau + objects[k].d[2]*dte_3dtoau;
 
 	}
 
@@ -267,23 +223,41 @@ for(k=0; k<sim_set->n_bodies; k++){
 	vel[2] = objects[k].vel[2] + objects[k].cdotifi[2]*dte_3;
 
 	// Positional truncation error
-	pos_eps[0] = c[5]*dte_3dtoau*(fx[k][5]-fx[k][6]);
-	pos_eps[1] = c[5]*dte_3dtoau*(fy[k][5]-fy[k][6]);
-	pos_eps[2] = c[5]*dte_3dtoau*(fz[k][5]-fz[k][6]);
+	pos_eps[0] = c5dte_3dtoau*(fx[k][5]-fx[k][6]);
+	pos_eps[1] = c5dte_3dtoau*(fy[k][5]-fy[k][6]);
+	pos_eps[2] = c5dte_3dtoau*(fz[k][5]-fz[k][6]);
 
-	// Calculate mean error
-	objects[k].eps_pos = (fabs(pos_eps[0])+fabs(pos_eps[1])+fabs(pos_eps[2]))/3.; 
-	fe = sim_set->eps_pos_thresh*(fabs(pos[0])+fabs(pos[1])+fabs(pos[2]))/objects[k].eps_pos;
-	dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*sqrt(fe)));
+	// Calculate total error
+	fe[0] = sim_set->eps_pos_thresh*fabs(pos[0])/fabs(pos_eps[0]);
+	fe[1] = sim_set->eps_pos_thresh*fabs(pos[1])/fabs(pos_eps[1]);
+	fe[2] = sim_set->eps_pos_thresh*fabs(pos[2])/fabs(pos_eps[2]);
+
+	fe_min = fe[0];
+
+	if ( fe[1] < fe_min ){
+		fe_min = fe[1];
+		if ( fe[2] < fe_min ){
+			fe_min = fe[2];
+		}
+	}
+
+	if ( sim_set->timestep_smoothing == 0 ){
+		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*fe_min));
+	}
+	else{
+		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*pow(fe_min, 0.2)));
+	}
 
 	// Chose the smallest timestep estimate for the next step
 	if ( dt_new_guess < dt_new ) dt_new = dt_new_guess;
 
 	// Check error thresholds
-	if( fe < 1. ){
+	if( fe_min < 1. ){
 		// Chose new timestep
 		sim_set->timestep = dt_new;
-		// Indicate that no new position and velocity values have been output
+		// Clear numercis
+		clear_numerics(objects, sim_set);
+		// Indicate that no new position and velocity values have been applied
 		return 1;
 	}
 	else{
@@ -299,15 +273,24 @@ for(k=0; k<sim_set->n_bodies; k++){
 
 }
 
-// All particles passed the error check. Assign new values to final variable
+// All particles passed the error check. Assign new values to final variables and clear numerics
 for(k=0;k<sim_set->n_bodies;k++){
-objects[k].pos[0] = objects[k].pos_new[0];
-objects[k].pos[1] = objects[k].pos_new[1];
-objects[k].pos[2] = objects[k].pos_new[2];
+	objects[k].pos[0] = objects[k].pos_new[0];
+	objects[k].pos[1] = objects[k].pos_new[1];
+	objects[k].pos[2] = objects[k].pos_new[2];
 
-objects[k].vel[0] = objects[k].vel_new[0];
-objects[k].vel[1] = objects[k].vel_new[1];
-objects[k].vel[2] = objects[k].vel_new[2];
+	objects[k].vel[0] = objects[k].vel_new[0];
+	objects[k].vel[1] = objects[k].vel_new[1];
+	objects[k].vel[2] = objects[k].vel_new[2];
+
+	objects[k].cifi[0] = 0;
+	objects[k].cifi[1] = 0;
+	objects[k].cifi[2] = 0;
+
+	objects[k].cdotifi[0] = 0;
+	objects[k].cdotifi[1] = 0;
+	objects[k].cdotifi[2] = 0;
+
 }
 
 // Increment timestep counter

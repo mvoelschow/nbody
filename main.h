@@ -31,6 +31,7 @@ double scale_min, scale_max, scale_step;
 double time;
 double time_end;
 double timestep_max;
+int timestep_smoothing;
 double time_output;
 double output_interval;
 int paused;
@@ -51,7 +52,8 @@ int auto_screenshot;
 int auto_textfile;
 int screenshot_counter;
 int screenshot_trigger;
-int output_counter;
+int auto_screenshot_counter;
+int auto_file_counter;
 double zoom_factor;
 int icon_mode;
 double icon_size_max;
@@ -110,14 +112,16 @@ void zoom_out(settings *sim_set);
 void zoom_in(settings *sim_set);
 void zoom_out_at_mouse_position(settings *sim_set);
 void zoom_in_at_mouse_position(settings *sim_set);
+void render_hud(SDL_Renderer *renderer, TTF_Font *fntCourier, settings *sim_set, planet objects[]);
 
 // From num.c
-//void adaptive_rkn45_step(planet objects[], settings *sim_set);
+void clear_numerics(planet objects[], settings *sim_set);
 double get_total_energy(planet objects[], settings *sim_set);
 void adaptive_rkn56_step(planet objects[], settings *sim_set);
 
 // From output.c
 void Generate_Output_File( planet objects[], settings *sim_set );
+void generate_auto_output( SDL_Renderer *renderer, planet objects[], settings *sim_set);
 void Write_Numerical_Stats(settings *sim_set);
 
 // From sdl.c

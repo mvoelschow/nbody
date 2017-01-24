@@ -455,3 +455,22 @@ render_exponential(renderer, sim_set->time/YR, 10, 30, 100, 40, clrWhite, fntCou
 render_text(renderer, "yrs", 100, 30, 30, 40, clrWhite, fntCourier);
 
 }
+
+
+
+void render_hud(SDL_Renderer *renderer, TTF_Font *fntCourier, settings *sim_set, planet objects[]){
+
+// Scale setting
+render_scale_setting(renderer, fntCourier, sim_set);
+
+// Timestep setting
+render_timestep_setting(renderer, fntCourier, sim_set);
+
+// Time information
+render_time_information(renderer, fntCourier, sim_set);
+
+// Object info box
+//if ( sim_set->selected_object != -1) render_object_info_box(renderer, objects, fntCourier, sim_set);
+
+
+}

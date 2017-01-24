@@ -8,7 +8,7 @@ educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.1.123 ALPHA
+Current release: 0.1.5 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -18,13 +18,18 @@ Current release: 0.1.123 ALPHA
               	- Object icon (Sun, Mercury, Earth, Jupiter) can be specified
               	- Object icon size can be customized in the init_bodies procedure
 
-20.01.2017:	- RKN5(6) implemented (stability tests pending)
+20.01.2017:	- RKN56 implemented (stability tests pending)
 
 22.01.2017:	- Total energy conservation check implemented
 		- High CPU load in pause mode bug fixed
 
 23.01.2017:	- Numerical stats output implemented 
 		- Code cleanups
+
+24.01.2017:	- RKN56 stability tests completed
+		- Right-click object info box deactivated (buggy)
+		- More rigerous truncation error calculation method (minimum fe)
+		- Timestep smoothing option added
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".

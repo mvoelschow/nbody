@@ -12,7 +12,7 @@ FILE *ofp;
 int i;
 
 // Generate filename
-sprintf(path, "output_%d.dat", sim_set->output_counter);
+sprintf(path, "output_%d.dat", sim_set->auto_file_counter);
 
 // Get pointer to file
 ofp = fopen(path, "w");
@@ -36,8 +36,19 @@ fprintf(ofp, "%i %le %le %le %le %le %le %le \n", objects[i].ident, objects[i].m
 // Close file
 fclose (ofp);      
 
-sim_set->output_counter = sim_set->output_counter + 1;
-sim_set->time_output = sim_set->time_output + sim_set->output_interval;
+sim_set->auto_file_counter++;
+
+}
+
+
+
+
+void generate_auto_output( SDL_Renderer *renderer, planet objects[], settings *sim_set){
+
+if ( sim_set->time >= sim_set->time_output ){
+	if( sim_set->auto_textfile == 1 ) Generate_Output_File( objects, sim_set );
+	if( sim_set->auto_screenshot == 1 ) create_auto_screenshot( renderer, sim_set );
+}
 
 }
 

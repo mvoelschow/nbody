@@ -30,14 +30,14 @@ sim_set->screenshot_trigger = 0;
 void create_auto_screenshot(SDL_Renderer *renderer, settings *sim_set){
 char path[18];
 
-sprintf(path, "auto_%d.bmp", sim_set->output_counter); // puts string into buffer
+sprintf(path, "auto_%d.bmp", sim_set->auto_screenshot_counter); // puts string into buffer
 
 SDL_Surface *sshot = SDL_CreateRGBSurface(0, sim_set->res_x, sim_set->res_y, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
 SDL_SaveBMP(sshot, path);
 SDL_FreeSurface(sshot);
 
-sim_set->output_counter++;
+sim_set->auto_screenshot_counter++;
 
 }
 
@@ -190,7 +190,6 @@ while(SDL_PollEvent(&event)){
 				sim_set->start_y = y;
 
 			}
-			/*
 			if( event.button.state == SDL_PRESSED && event.button.button == SDL_BUTTON_RIGHT && sim_set->selected_object == -1){
 			
 				// Get mouse position
@@ -212,7 +211,6 @@ while(SDL_PollEvent(&event)){
 
 
 			}
-			*/
 
 			}
 			break;
@@ -387,6 +385,9 @@ void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *si
 int i, i_plot;
 double sin_y_rot, cos_y_rot, sin_x_rot, cos_x_rot;
 
+// Calculate screen coordinates
+get_planar_screen_coordinates(objects, sim_set);
+
 sin_y_rot = sin(sim_set->y_rot*deg_to_rad);
 cos_y_rot = cos(sim_set->y_rot*deg_to_rad);
 
@@ -396,8 +397,8 @@ cos_x_rot = cos(sim_set->x_rot*deg_to_rad);
 // Get projected distances 
 for(i=0; i<sim_set->n_bodies; i=i+1){
 
-objects[i].z_projected = (-objects[i].pos[0]*cos_x_rot*sin_y_rot+objects[i].pos[1]*sin_x_rot+objects[i].pos[2]*cos_x_rot*cos_y_rot);
-objects[i].plot_order = i;
+	objects[i].z_projected = (-objects[i].pos[0]*cos_x_rot*sin_y_rot+objects[i].pos[1]*sin_x_rot+objects[i].pos[2]*cos_x_rot*cos_y_rot);
+	objects[i].plot_order = i;
 
 }
 

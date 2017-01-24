@@ -1,6 +1,3 @@
-// Compile via
-// gcc -O3 -o nbody nbody.c setup.c output.c sdl.c hud.c num.c -lm `sdl2-config --cflags --libs` -lSDL2_ttf
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,21 +9,6 @@
 #include <SDL_ttf.h>
 
 
-
-void generate_auto_output( SDL_Renderer *renderer, planet objects[], settings *sim_set){
-
-if ( sim_set->time >= sim_set->time_output ){
-	if( sim_set->auto_textfile == 1 ) Generate_Output_File( objects, sim_set );
-	if( sim_set->auto_screenshot == 1 ) create_auto_screenshot( renderer, sim_set );
-}
-
-}
-
-
-
-// ***********************************************************
-// Main program
-// ***********************************************************
 
 
 int main(){
@@ -42,7 +24,6 @@ int done = 0;
 
 // Misc
 settings sim_set;
-
 planet *objects;
 
 
@@ -62,7 +43,6 @@ init_settings(&sim_set);
 objects = (planet *)malloc(sizeof(planet)*sim_set.n_bodies);
 
 
-
 // ***********************************************************
 //   Initialize bodies
 // ***********************************************************
@@ -77,10 +57,10 @@ sim_set.E_tot = sim_set.E_tot_0;
 
 
 // ***********************************************************
-//   Initialize time argument
+//   Initialize time argument and numerics
 // ***********************************************************
 sim_set.time = 0.;
-
+clear_numerics(objects, &sim_set);
 
 
 // ***********************************************************
@@ -106,7 +86,7 @@ TTF_Font *fntCourier = TTF_OpenFont( "fonts/HighlandGothicFLF.ttf", 36 );
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-window = SDL_CreateWindow(	"nbody 0.1.123 ALPHA",	// Window title
+	window = SDL_CreateWindow("nbody 0.1.5 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -116,7 +96,7 @@ window = SDL_CreateWindow(	"nbody 0.1.123 ALPHA",	// Window title
 }
 else{
 
-window = SDL_CreateWindow(	"nbody 0.1.123 ALPHA",	// Window title
+	window = SDL_CreateWindow("nbody 0.1.5 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -127,10 +107,10 @@ window = SDL_CreateWindow(	"nbody 0.1.123 ALPHA",	// Window title
 
 // Initialize renderer ( VSYNC ON/OFF)
 if ( sim_set.vsync == 1 ){
-renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // VSYNC ON
+	renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // VSYNC ON
 }
 else{
-renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED); // VSYNC OFF
+	renderer = SDL_CreateRenderer(window,-1, SDL_RENDERER_ACCELERATED); // VSYNC OFF
 }
 
 
@@ -164,89 +144,74 @@ SDL_FreeSurface(background_surf);
 
 
 // Event loop
-while(!done)
-{
+while(!done){
 
-// Check for events
-done=processEvents(window, &sim_set, objects);
+	// Check for events
+	done=processEvents(window, &sim_set, objects);
 
-// Draw background
-Draw_Background(renderer, background, &sim_set);
+	// Draw background
+	Draw_Background(renderer, background, &sim_set);
 
-// Update bodies
-if ( sim_set.paused != 1 ){
+	// Update bodies
+	if ( sim_set.paused != 1 ){
 
-	switch(sim_set.integrator) {
-		case 5: adaptive_rkn56_step(objects, &sim_set); break;
-		default: adaptive_rkn56_step(objects, &sim_set); break;
+		switch(sim_set.integrator) {
+			case 5: adaptive_rkn56_step(objects, &sim_set); break;
+			default: adaptive_rkn56_step(objects, &sim_set); break;
+		}
+	}
+	else{
+	render_paused(renderer, fntCourier, &sim_set);
 	}
 
-}
-else{
-render_paused(renderer, fntCourier, &sim_set);
-}
+	// Render objects
+	render_all_bodies_3D(renderer, objects, &sim_set);
 
-// Calculate screen coordinates
-get_planar_screen_coordinates(objects,&sim_set);
+	// Some HUD
+	render_hud(renderer, fntCourier, &sim_set, objects);
 
-// Render objects
-render_all_bodies_3D(renderer, objects, &sim_set);
+	// Finally, show it all
+	Render_Screen(renderer);
 
-// Some HUD
-// Scale setting
-render_scale_setting(renderer, fntCourier, &sim_set);
-
-// Timestep setting
-render_timestep_setting(renderer, fntCourier, &sim_set);
-
-// Time information
-render_time_information(renderer, fntCourier, &sim_set);
-
-// Object info box
-if ( sim_set.selected_object != -1) render_object_info_box(renderer, objects, fntCourier, &sim_set);
-
-// Finally, show it all
-Render_Screen(renderer);
-
-// Check if automatic output is scheduled
-if ( sim_set.paused != 1 && sim_set.time >= sim_set.time_output ) {
+	// Check if automatic output is scheduled
+	if ( sim_set.paused != 1 && sim_set.time >= sim_set.time_output ) {
 	
-	if ( sim_set.check_delta_E == 1 ){
-		sim_set.E_tot = get_total_energy(objects, &sim_set);
-		Write_Numerical_Stats(&sim_set);
+		if ( sim_set.check_delta_E == 1 ){
+			sim_set.E_tot = get_total_energy(objects, &sim_set);
+			Write_Numerical_Stats(&sim_set);
+		}
+
+		generate_auto_output(renderer, objects, &sim_set);
+		sim_set.time_output += sim_set.output_interval;
 	}
 
-	generate_auto_output(renderer, objects, &sim_set);
-	sim_set.time_output += sim_set.output_interval;
-}
 
-
-// Check if screenshot output is scheduled
-if( sim_set.screenshot_trigger == 1 ){
-create_screenshot(renderer, &sim_set);
-}
-
-// Check for simulation end
-if ( sim_set.paused == 0 ) {
-
-	if ( sim_set.time >= sim_set.time_end && sim_set.finished == 0 ){
-		sim_set.finished = 1;
-		sim_set.paused = 1;
+	// Check if screenshot output is scheduled
+	if( sim_set.screenshot_trigger == 1 ){
+		create_screenshot(renderer, &sim_set);
 	}
 
-	if ( fabs((sim_set.E_tot-sim_set.E_tot_0)/sim_set.E_tot_0) > sim_set.delta_E_thresh ){
-		sim_set.finished = 1;
-		sim_set.paused = 1;
+	// Check for simulation end
+	if ( sim_set.paused == 0 ) {
+
+		if ( sim_set.time >= sim_set.time_end && sim_set.finished == 0 ){
+			sim_set.finished = 1;
+			sim_set.paused = 1;
+		}
+
+		if ( fabs((sim_set.E_tot-sim_set.E_tot_0)/sim_set.E_tot_0) > sim_set.delta_E_thresh ){
+			sim_set.finished = 1;
+			sim_set.paused = 1;
+		}
+
 	}
 
+	// Don't burn the CPU in pause mode
+	if ( sim_set.paused == 1 ) SDL_Delay(200);
+
 }
 
-if ( sim_set.paused == 1 ) SDL_Delay(200);
-
-}
-
-
-// Unload fond
+// Unload font
 TTF_CloseFont( fntCourier );
 
 // Close window renderer

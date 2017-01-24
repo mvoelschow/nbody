@@ -37,12 +37,16 @@ sim_set->n_bodies = 2;
 sim_set->integrator = 5;
 
 // Maximum relative error per step for position and velocity
-sim_set->eps_vel_thresh = 1.E-10;
-sim_set->eps_pos_thresh = 1.E-10;
+sim_set->eps_vel_thresh = 1.E-16;
+sim_set->eps_pos_thresh = 1.E-16;
 
 // Maximum relative deviation from the system's initial energy budget
 sim_set->check_delta_E = 1;
 sim_set->delta_E_thresh = 0.01;
+
+// Timestep smoothing. Improves performance at the cost of some precision loss
+sim_set->timestep_smoothing = 1;
+
 
 // *******************************
 // Time settings
@@ -52,15 +56,15 @@ sim_set->delta_E_thresh = 0.01;
 sim_set->timestep_max = 100.;
 
 // Time at which the simulation ends [days]
-sim_set->time_end = 1.E2*YR;
+sim_set->time_end = 1.E3*YR;
 
 
 // *******************************
 // Camera and visual settings
 // *******************************
 // Resolution
-sim_set->res_x = 1200;
-sim_set->res_y = 900;
+sim_set->res_x = 1000;
+sim_set->res_y = 800;
 
 // Fullscreen mode on/off
 sim_set->fullscreen = 0;
@@ -108,7 +112,8 @@ sim_set->auto_timestep = 1;
 sim_set->finished = 0;
 sim_set->screenshot_counter = 0;
 sim_set->screenshot_trigger = 1;
-sim_set->output_counter = 0;
+sim_set->auto_screenshot_counter = 0;
+sim_set->auto_file_counter = 0;
 sim_set->time_output = 0.;
 sim_set->timestep_counter = 0;
 sim_set->x_rot = 0.;
