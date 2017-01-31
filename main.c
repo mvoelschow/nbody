@@ -147,7 +147,7 @@ SDL_FreeSurface(background_surf);
 while(!done){
 
 	// Check for events
-	done=processEvents(window, &sim_set, objects);
+	done=processEvents(&sim_set, objects);
 
 	// Draw background
 	Draw_Background(renderer, background, &sim_set);
@@ -156,8 +156,8 @@ while(!done){
 	if ( sim_set.paused != 1 ){
 
 		switch(sim_set.integrator) {
-			case 5: adaptive_rkn56_step(objects, &sim_set); break;
-			default: adaptive_rkn56_step(objects, &sim_set); break;
+			case 5: adaptive_rkn5_step(objects, &sim_set); break;
+			default: adaptive_rkn5_step(objects, &sim_set); break;
 		}
 	}
 	else{

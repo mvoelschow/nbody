@@ -126,7 +126,7 @@ acc[2] = a_z;
 
 
 
-int rkn56_step(planet objects[], settings *sim_set){
+int rkn5_step(planet objects[], settings *sim_set){
 
 int i, j, k;
 const int n=7;
@@ -305,9 +305,9 @@ return 0;
 
 
 
-void adaptive_rkn56_step(planet objects[], settings *sim_set){
+void adaptive_rkn5_step(planet objects[], settings *sim_set){
 
-rkn56_step(objects, sim_set);
+rkn5_step(objects, sim_set);
 
 }
 

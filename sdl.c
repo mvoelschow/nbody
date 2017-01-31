@@ -77,7 +77,7 @@ sim_set->paused = 0;
 
 
 
-int processEvents(SDL_Window *window, settings *sim_set, planet objects[]){
+int processEvents(settings *sim_set, planet objects[]){
 SDL_Event event;
 int done=0;
 int x, y;
@@ -90,11 +90,7 @@ while(SDL_PollEvent(&event)){
 
 		case SDL_WINDOWEVENT_CLOSE:
 			{
-			if(window){
-				SDL_DestroyWindow(window);
-				window = NULL;
 				done = 1;
-			}
 			}
 			break;
 
