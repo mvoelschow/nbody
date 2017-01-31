@@ -8,7 +8,7 @@ educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.1.5 ALPHA
+Current release: 0.1.6 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -31,6 +31,10 @@ Current release: 0.1.5 ALPHA
 		- Right-click object info box deactivated (buggy)
 		- More rigerous truncation error calculation method (minimum fe)
 		- Timestep smoothing option added
+
+31.01.2017:	- Minor code cleanups
+		- Interactive mode switch implemented
+		- CMS options added 
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".

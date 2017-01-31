@@ -47,6 +47,12 @@ objects = (planet *)malloc(sizeof(planet)*sim_set.n_bodies);
 //   Initialize bodies
 // ***********************************************************
 init_bodies(objects, &sim_set);
+// Calculate total mass
+sim_set.m_tot = 0.;
+int i;
+for(i=0;i<sim_set.n_bodies;i++){
+	sim_set.m_tot+=objects[i].mass;
+}
 
 
 // ***********************************************************
@@ -86,7 +92,7 @@ TTF_Font *fntCourier = TTF_OpenFont( "fonts/HighlandGothicFLF.ttf", 36 );
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-	window = SDL_CreateWindow("nbody 0.1.5 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.1.6 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -96,7 +102,7 @@ if ( sim_set.fullscreen == 0 ){
 }
 else{
 
-	window = SDL_CreateWindow("nbody 0.1.5 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.1.6 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -149,9 +155,6 @@ while(!done){
 	// Check for events
 	done=processEvents(&sim_set, objects);
 
-	// Draw background
-	Draw_Background(renderer, background, &sim_set);
-
 	// Update bodies
 	if ( sim_set.paused != 1 ){
 
@@ -160,18 +163,27 @@ while(!done){
 			default: adaptive_rkn5_step(objects, &sim_set); break;
 		}
 	}
-	else{
-	render_paused(renderer, fntCourier, &sim_set);
+
+
+	if ( sim_set.time >= sim_set.time_output || sim_set.interactive_mode == 1 || sim_set.paused == 1) {
+
+		// Draw background
+		Draw_Background(renderer, background, &sim_set);
+
+		if ( sim_set.focus_on_cms == 1 ) center_at_cms(&sim_set, objects);
+
+		// Render objects
+		render_all_bodies_3D(renderer, objects, &sim_set);
+
+		// Some HUD
+		render_hud(renderer, fntCourier, &sim_set, objects);
+
+		if (sim_set.paused == 1) render_paused(renderer, fntCourier, &sim_set);
+
+		// Finally, show it all
+		Render_Screen(renderer);
+
 	}
-
-	// Render objects
-	render_all_bodies_3D(renderer, objects, &sim_set);
-
-	// Some HUD
-	render_hud(renderer, fntCourier, &sim_set, objects);
-
-	// Finally, show it all
-	Render_Screen(renderer);
 
 	// Check if automatic output is scheduled
 	if ( sim_set.paused != 1 && sim_set.time >= sim_set.time_output ) {
@@ -207,7 +219,7 @@ while(!done){
 	}
 
 	// Don't burn the CPU in pause mode
-	if ( sim_set.paused == 1 ) SDL_Delay(200);
+	if ( sim_set.paused == 1 ) SDL_Delay(20);
 
 }
 

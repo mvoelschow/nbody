@@ -16,6 +16,8 @@
 
 typedef struct
 {
+double cms[3];
+int focus_on_cms;
 int draw_background;
 int res_x, res_y;
 int fullscreen;
@@ -38,6 +40,7 @@ int paused;
 int finished;
 double eps_vel_thresh;
 double eps_pos_thresh;
+double m_tot;
 double E_tot_0;
 double E_tot;
 double delta_E_thresh;
@@ -59,6 +62,8 @@ int icon_mode;
 double icon_size_max;
 int vsync;
 int integrator;
+int interactive_mode;
+int update_screen;
 SDL_Texture *icon_sun;
 SDL_Texture *icon_jupiter;
 SDL_Texture *icon_earth;
@@ -125,6 +130,7 @@ void generate_auto_output( SDL_Renderer *renderer, planet objects[], settings *s
 void Write_Numerical_Stats(settings *sim_set);
 
 // From sdl.c
+void center_at_cms(settings *sim_set, planet objects[]);
 void create_screenshot(SDL_Renderer *renderer, settings *sim_set);
 void create_auto_screenshot(SDL_Renderer *renderer, settings *sim_set);
 void Draw_Background(SDL_Renderer *renderer, SDL_Texture *background, settings *sim_set);

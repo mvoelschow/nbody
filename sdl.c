@@ -10,6 +10,52 @@
 
 
 
+void center_at_cms(settings *sim_set, planet objects[]){
+int i;
+double scale_factor;
+double x,y,z;
+double sin_y_rot, cos_y_rot, sin_x_rot, cos_x_rot;
+double sx, sy;
+
+sin_y_rot = sin(sim_set->y_rot*deg_to_rad);
+cos_y_rot = cos(sim_set->y_rot*deg_to_rad);
+
+sin_x_rot = sin(sim_set->x_rot*deg_to_rad);
+cos_x_rot = cos(sim_set->x_rot*deg_to_rad);
+
+// Clear CMS
+sim_set->cms[0] = 0.;
+sim_set->cms[1] = 0.;
+sim_set->cms[2] = 0.;
+
+// Calculate CMS coordinates
+for(i=0; i<sim_set->n_bodies; i++){
+
+	sim_set->cms[0] += objects[i].pos[0]*objects[i].mass;
+	sim_set->cms[1] += objects[i].pos[1]*objects[i].mass;
+	sim_set->cms[2] += objects[i].pos[2]*objects[i].mass;
+
+}
+
+sim_set->cms[0] = sim_set->cms[0]/sim_set->m_tot;
+sim_set->cms[1] = sim_set->cms[1]/sim_set->m_tot;
+sim_set->cms[2] = sim_set->cms[2]/sim_set->m_tot;
+
+x = sim_set->cms[0];
+y = sim_set->cms[1];
+z = sim_set->cms[2];
+
+scale_factor = sim_set->res_x/sim_set->scale;
+
+sx = scale_factor*x*cos_y_rot+scale_factor*z*sin_y_rot;
+sy = scale_factor*x*sin_x_rot*sin_y_rot+scale_factor*y*cos_x_rot-scale_factor*z*sin_x_rot*cos_y_rot; 
+
+sim_set->center_screen_x = 0.5*sim_set->res_x + sx;
+sim_set->center_screen_y = 0.5*sim_set->res_y - sy;
+
+}
+
+
 void create_screenshot(SDL_Renderer *renderer, settings *sim_set){
 char path[18];
 
@@ -44,18 +90,13 @@ sim_set->auto_screenshot_counter++;
 
 
 
-void switch_timestep_mode(settings *sim_set){
+void switch_interactive_mode(settings *sim_set){
 
-if ( sim_set->auto_timestep == 0 ){
-sim_set->auto_timestep = 1;
+if ( sim_set->interactive_mode == 0 ){
+sim_set->interactive_mode = 1;
 }
 else{
-sim_set->auto_timestep = 0;
-
-	while(sim_set->timestep > sim_set->timestep_max){
-	sim_set->timestep = 0.5*sim_set->timestep;
-	}
-	
+sim_set->interactive_mode = 0;
 }
 
 }
@@ -107,9 +148,13 @@ while(SDL_PollEvent(&event)){
 					sim_set->timestep = sim_set->timestep * 0.5;
 				break;
 
-				case SDLK_c:
+				case SDLK_o:
 					sim_set->center_screen_x = 0.5*sim_set->res_x;
 					sim_set->center_screen_y = 0.5*sim_set->res_y;
+				break;
+
+				case SDLK_c:
+					center_at_cms(sim_set, objects);
 				break;
 
 				case SDLK_DOWN:
@@ -141,8 +186,8 @@ while(SDL_PollEvent(&event)){
 					switch_pause_mode(sim_set);
 				break;
 
-				case SDLK_a:
-					switch_timestep_mode(sim_set);
+				case SDLK_i:
+					switch_interactive_mode(sim_set);
 				break;
 
 				case SDLK_s:

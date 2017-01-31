@@ -84,11 +84,17 @@ sim_set->draw_background = 1;
 // VSYNC on/off (framerate cap at 60 FPS)
 sim_set->vsync = 0;
 
+// Show every calculated timestep
+sim_set->interactive_mode = 1;
+
+// CMS focus
+sim_set->focus_on_cms = 0;
+
 // *******************************
 // Data output
 // *******************************
 // Time interval for automatic data output
-sim_set->output_interval = 0.1*YR;
+sim_set->output_interval = 1.*YR;
 
 // Automatically output screenshots
 sim_set->auto_screenshot = 0;
