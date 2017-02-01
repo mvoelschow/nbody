@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <time.h>
-// #include <omp.h>
-
+#include <omp.h>
 #include "main.h"
 
 
@@ -77,44 +76,30 @@ return e_sum;
 void get_acc_vector(planet objects[], settings *sim_set, int skip_id, double acc[]){
 // loc in AU, acc in m/s²
 int i;
-double a_x, a_y, a_z, dist, delta[3], GModist, kAU;
-double loc[3];
+double a_x=0., a_y=0., a_z=0., dist, delta[3], GModist;
+const double kAU=1.E3*AU;
+const double loc[3]={objects[skip_id].pos_new[0], objects[skip_id].pos_new[1], objects[skip_id].pos_new[2]};
 
-loc[0] = objects[skip_id].pos_new[0];
-loc[1] = objects[skip_id].pos_new[1];
-loc[2] = objects[skip_id].pos_new[2];
-
-//omp_set_num_threads(2);
-
-//#pragma omp parallel default(none) private(kAU, i, delta, GModist) shared(a_x, a_y, a_z, objects, sim_set, skip_id, loc, acc)
-
-a_x = 0.;
-a_y = 0.;
-a_z = 0.;
-
-kAU = 1.E3*AU;
-
-//#pragma omp parallel for schedule(static) reduction(+:a_x) reduction(+:a_y) reduction(+:a_z)
 for(i=0; i<sim_set->n_bodies; i=i+1){
 
-if ( i == skip_id ){
-continue;
-}
+	if ( i == skip_id ){
+		continue;
+	}
 
-// AU->m
-delta[0] = kAU*(objects[i].pos_new[0] - loc[0]);
-delta[1] = kAU*(objects[i].pos_new[1] - loc[1]);
-delta[2] = kAU*(objects[i].pos_new[2] - loc[2]);
+	// AU->m
+	delta[0] = kAU*(objects[i].pos_new[0] - loc[0]);
+	delta[1] = kAU*(objects[i].pos_new[1] - loc[1]);
+	delta[2] = kAU*(objects[i].pos_new[2] - loc[2]);
 
-// m
-dist = sqrt( delta[0]*delta[0] + delta[1]*delta[1] + delta[2]*delta[2]) ;
+	// m
+	dist = sqrt( delta[0]*delta[0] + delta[1]*delta[1] + delta[2]*delta[2]) ;
 
-// SI
-GModist = G_cst * objects[i].mass/(dist*dist*dist);
+	// SI
+	GModist = G_cst * objects[i].mass/(dist*dist*dist);
 
-a_x += GModist * delta[0];
-a_y += GModist * delta[1];
-a_z += GModist * delta[2];
+	a_x += GModist * delta[0];
+	a_y += GModist * delta[1];
+	a_z += GModist * delta[2];
 
 }
 
@@ -126,13 +111,12 @@ acc[2] = a_z;
 
 
 
-int rkn5_step(planet objects[], settings *sim_set){
+void rkn5_step(planet objects[], settings *sim_set){
 
 int i, j, k;
 const int n=7;
 
 double acc[3];
-double vel[3], pos[3];
 double pos_eps[3];
 
 double fx[sim_set->n_bodies][n];
@@ -159,10 +143,14 @@ const double c5dte_3dtoau = c[5]*dte_3dtoau;
 // Just some crazy high initial guess
 dt_new = 1.e100;
 
+// Set number of threads
+omp_set_num_threads(sim_set->n_threads);
+
 // Calculate f_i values
 for(i=0; i<n; i++){
 
 	// Assign positions for the i-th evaluation of the acceleration function
+	#pragma omp parallel for schedule(static) default (none) shared(objects, sim_set, i, fx, fy, fz) private(j)
 	for(k=0; k<sim_set->n_bodies; k++){
 
 		objects[k].d[0]=0.;
@@ -184,6 +172,7 @@ for(i=0; i<n; i++){
 	}
 
 	// Evaluate the acceleration function for all particles 
+	#pragma omp parallel for schedule(static) default (none) shared(objects, sim_set, fx, fy, fz, i) private(acc)
 	for(k=0; k<sim_set->n_bodies; k++){
 
 		get_acc_vector(objects, sim_set, k, acc);
@@ -213,14 +202,14 @@ for(i=0; i<n; i++){
 for(k=0; k<sim_set->n_bodies; k++){
 
 	// AU
-	pos[0] = objects[k].pos[0] + objects[k].vel[0]*dtoau + objects[k].cifi[0]*dte_3dtoau;
-	pos[1] = objects[k].pos[1] + objects[k].vel[1]*dtoau + objects[k].cifi[1]*dte_3dtoau;
-	pos[2] = objects[k].pos[2] + objects[k].vel[2]*dtoau + objects[k].cifi[2]*dte_3dtoau;
+	objects[k].pos_new[0] = objects[k].pos[0] + objects[k].vel[0]*dtoau + objects[k].cifi[0]*dte_3dtoau;
+	objects[k].pos_new[1] = objects[k].pos[1] + objects[k].vel[1]*dtoau + objects[k].cifi[1]*dte_3dtoau;
+	objects[k].pos_new[2] = objects[k].pos[2] + objects[k].vel[2]*dtoau + objects[k].cifi[2]*dte_3dtoau;
 
 	// km/s
-	vel[0] = objects[k].vel[0] + objects[k].cdotifi[0]*dte_3;
-	vel[1] = objects[k].vel[1] + objects[k].cdotifi[1]*dte_3;
-	vel[2] = objects[k].vel[2] + objects[k].cdotifi[2]*dte_3;
+	objects[k].vel_new[0] = objects[k].vel[0] + objects[k].cdotifi[0]*dte_3;
+	objects[k].vel_new[1] = objects[k].vel[1] + objects[k].cdotifi[1]*dte_3;
+	objects[k].vel_new[2] = objects[k].vel[2] + objects[k].cdotifi[2]*dte_3;
 
 	// Positional truncation error
 	pos_eps[0] = c5dte_3dtoau*(fx[k][5]-fx[k][6]);
@@ -228,10 +217,11 @@ for(k=0; k<sim_set->n_bodies; k++){
 	pos_eps[2] = c5dte_3dtoau*(fz[k][5]-fz[k][6]);
 
 	// Calculate total error
-	fe[0] = sim_set->eps_pos_thresh*fabs(pos[0])/fabs(pos_eps[0]);
-	fe[1] = sim_set->eps_pos_thresh*fabs(pos[1])/fabs(pos_eps[1]);
-	fe[2] = sim_set->eps_pos_thresh*fabs(pos[2])/fabs(pos_eps[2]);
+	fe[0] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[0])/fabs(pos_eps[0]);
+	fe[1] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[1])/fabs(pos_eps[1]);
+	fe[2] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[2])/fabs(pos_eps[2]);
 
+	// Find largest error
 	fe_min = fe[0];
 
 	if ( fe[1] < fe_min ){
@@ -241,11 +231,11 @@ for(k=0; k<sim_set->n_bodies; k++){
 		}
 	}
 
-	if ( sim_set->timestep_smoothing < 1. ){
-		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*fe_min));
+	if ( sim_set->timestep_smoothing > 1. ){
+		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*pow(fe_min, 1./sim_set->timestep_smoothing)));
 	}
 	else{
-		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*pow(fe_min, 1./sim_set->timestep_smoothing)));
+		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*fe_min));
 	}
 
 	// Chose the smallest timestep estimate for the next step
@@ -258,22 +248,13 @@ for(k=0; k<sim_set->n_bodies; k++){
 		// Clear numercis
 		clear_numerics(objects, sim_set);
 		// Indicate that no new position and velocity values have been applied
-		return 1;
-	}
-	else{
-		// Assign values to temporary variable
-		objects[k].pos_new[0] = pos[0];
-		objects[k].pos_new[1] = pos[1];
-		objects[k].pos_new[2] = pos[2];
-
-		objects[k].vel_new[0] = vel[0];
-		objects[k].vel_new[1] = vel[1];
-		objects[k].vel_new[2] = vel[2];
+		return;
 	}
 
 }
 
 // All particles passed the error check. Assign new values to final variables and clear numerics
+#pragma omp parallel for schedule(static) default (none) shared(sim_set, objects)
 for(k=0;k<sim_set->n_bodies;k++){
 	objects[k].pos[0] = objects[k].pos_new[0];
 	objects[k].pos[1] = objects[k].pos_new[1];
@@ -299,7 +280,7 @@ sim_set->timestep_counter = sim_set->timestep_counter + 1;
 sim_set->time = sim_set->time + sim_set->timestep;
 // Update timestep
 sim_set->timestep = dt_new;
-return 0;
+return;
 
 }
 

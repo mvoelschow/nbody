@@ -8,7 +8,7 @@ educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.1.6 ALPHA
+Current release: 0.1.7 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -34,7 +34,11 @@ Current release: 0.1.6 ALPHA
 
 31.01.2017:	- Minor code cleanups
 		- Interactive mode switch implemented
-		- CMS options added 
+		- CMS options added
+
+01.02.2017:	- Minor RKN5 optimizations
+		- RKN5 partially parallelized
+		- Number of threads can be specified 
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".

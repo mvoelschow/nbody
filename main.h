@@ -16,6 +16,7 @@
 
 typedef struct
 {
+int n_threads;
 double cms[3];
 int focus_on_cms;
 int draw_background;

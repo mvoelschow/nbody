@@ -45,8 +45,10 @@ sim_set->check_delta_E = 1;
 sim_set->delta_E_thresh = 0.01;
 
 // Timestep smoothing. Improves performance at the cost of some precision loss
-sim_set->timestep_smoothing = 3.;
+sim_set->timestep_smoothing = 1.;
 
+// Number of threads to use
+sim_set->n_threads = 1;
 
 // *******************************
 // Time settings
@@ -64,7 +66,7 @@ sim_set->time_end = 1.E3*YR;
 // *******************************
 // Resolution
 sim_set->res_x = 800;
-sim_set->res_y = 600;
+sim_set->res_y = 800;
 
 // Fullscreen mode on/off
 sim_set->fullscreen = 0;
@@ -88,13 +90,13 @@ sim_set->vsync = 0;
 sim_set->interactive_mode = 1;
 
 // CMS focus
-sim_set->focus_on_cms = 0;
+sim_set->focus_on_cms = 1;
 
 // *******************************
 // Data output
 // *******************************
 // Time interval for automatic data output
-sim_set->output_interval = 1.*YR;
+sim_set->output_interval = 0.5*YR;
 
 // Automatically output screenshots
 sim_set->auto_screenshot = 0;
@@ -181,7 +183,7 @@ objects[1].vel[2] = 0.;
 
 
 
-// Planetesimals between 1 and 10 au
+// Planetesimals between 3 and 5 au
 for(i=2; i<sim_set->n_bodies; i=i+1){
 
 // Set body mass [kg]
@@ -189,7 +191,7 @@ objects[i].mass = 1.E19*(99.*randomDouble()+1.);
 objects[i].icon_num = 1;
 objects[i].icon_size = 4;
 
-r = 3+2.*randomDouble();
+r = 3.+2.*randomDouble();
 phi = randomDouble()*2.*PI;
 
 // Set body position [AU]

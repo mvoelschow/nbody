@@ -92,7 +92,7 @@ TTF_Font *fntCourier = TTF_OpenFont( "fonts/HighlandGothicFLF.ttf", 36 );
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-	window = SDL_CreateWindow("nbody 0.1.6 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.1.7 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -102,7 +102,7 @@ if ( sim_set.fullscreen == 0 ){
 }
 else{
 
-	window = SDL_CreateWindow("nbody 0.1.6 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.1.7 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -170,7 +170,7 @@ while(!done){
 		// Draw background
 		Draw_Background(renderer, background, &sim_set);
 
-		if ( sim_set.focus_on_cms == 1 ) center_at_cms(&sim_set, objects);
+		if ( sim_set.focus_on_cms == 1 && sim_set.paused == 0) center_at_cms(&sim_set, objects);
 
 		// Render objects
 		render_all_bodies_3D(renderer, objects, &sim_set);
@@ -219,7 +219,7 @@ while(!done){
 	}
 
 	// Don't burn the CPU in pause mode
-	if ( sim_set.paused == 1 ) SDL_Delay(20);
+	if ( sim_set.paused == 1 ) SDL_Delay(25);
 
 }
 
