@@ -113,7 +113,7 @@ acc[2] = a_z;
 
 void rkn5_step(planet objects[], settings *sim_set){
 
-int i, j, k, recalculate;
+int i, j, k, recalculate=0;
 const int n=7;
 
 double acc[3];
