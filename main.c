@@ -92,7 +92,7 @@ TTF_Font *fntCourier = TTF_OpenFont( "fonts/HighlandGothicFLF.ttf", 36 );
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-	window = SDL_CreateWindow("nbody 0.1.7 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.2 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -102,7 +102,7 @@ if ( sim_set.fullscreen == 0 ){
 }
 else{
 
-	window = SDL_CreateWindow("nbody 0.1.7 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.2 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
