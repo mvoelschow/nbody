@@ -2,7 +2,9 @@
 ####################                    nbody 			  ####################
 ######################################################################################
 
-nbody is a simple n-body code written in C, parallelized with OpenMP for shared-memory systems and utilizing the SDL2 library for graphical output, making it a handy tool to run interactive n-body simulations for both scientific and educational purposes.
+nbody is a simple n-body code written in C, parallelized with OpenMP for shared-memory systems and 
+utilizing the SDL2 library for graphical output, making it a handy tool to run interactive 
+n-body simulations for both scientific and educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
