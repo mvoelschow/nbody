@@ -18,7 +18,7 @@ Current release: 0.2 ALPHA
 
 20.01.2017:	- RKN56 implemented (stability tests pending)
 
-22.01.2017:	- Total energy conservation check implemented
+22.01.2017:	- Total energy conservation check implemented (CMS motion not considered yet)
 		- High CPU load in pause mode bug fixed
 
 23.01.2017:	- Numerical stats output implemented 
