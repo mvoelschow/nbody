@@ -190,7 +190,7 @@ while(!done){
 	
 		if ( sim_set.check_delta_E == 1 ){
 			sim_set.E_tot = get_total_energy(objects, &sim_set);
-			Write_Numerical_Stats(&sim_set);
+			if ( sim_set.output_delta_E == 1 ) Write_Numerical_Stats(&sim_set);
 		}
 
 		generate_auto_output(renderer, objects, &sim_set);

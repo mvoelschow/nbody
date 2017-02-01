@@ -2,13 +2,11 @@
 ####################                    nbody 			  ####################
 ######################################################################################
 
-nbody is a simple n-body code written in C and utilizing the SDL2 library for graphical
-output, making it a handy tool to run interactive n-body simulations for both scientific and 
-educational purposes.
+nbody is a simple n-body code written in C, parallelized with OpenMP for shared-memory systems and utilizing the SDL2 library for graphical output, making it a handy tool to run interactive n-body simulations for both scientific and educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.1.7 ALPHA
+Current release: 0.2 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -37,14 +35,16 @@ Current release: 0.1.7 ALPHA
 		- CMS options added
 
 01.02.2017:	- Minor RKN5 optimizations
-		- RKN5 partially parallelized
-		- Number of threads can be specified 
+		- RKN5 parallelized
+		- Number of threads can be specified
+		- Code cleanups 
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".
 The GNU C compiler gcc, SDL2 and SDL2_ttf must be present.
 
 ### Running a simulation ###
-At this very early stage of the project, the simulation setup is hard-coded. 
-The program calls the "init_bodies" routine that can be found and modified 
-in the setup.c file. 
+At this very early stage of the project, both the settings and the simulation setup are hard-coded in the setup.c module. 
+The main program calls the "init_bodies" routine that can be found and modified in the setup.c file. 
+For a quick start, simply call one of the example setups you can find in the examples.c file. 
+A full description on how to get started will be provided with the first official release of the code.

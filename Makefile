@@ -5,8 +5,11 @@ NAME = nbody
 programs: nbody
 	rm -f *.o
 
-nbody: main.o main.h hud.o num.o output.o sdl.o setup.o
-	${CC} -fopenmp -o ${NAME} main.o hud.o num.o output.o sdl.o setup.o ${CFLAGS}
+nbody: main.o main.h examples.o hud.o num.o output.o sdl.o setup.o
+	${CC} -fopenmp -o ${NAME} main.o examples.o hud.o num.o output.o sdl.o setup.o ${CFLAGS}
+
+examples.o: examples.c
+	${CC} -c examples.c ${CFLAGS}
 
 main.o: main.c
 	${CC} -c main.c ${CFLAGS}

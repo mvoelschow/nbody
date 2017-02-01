@@ -50,7 +50,7 @@ scale_factor = sim_set->res_x/sim_set->scale;
 sx = scale_factor*x*cos_y_rot+scale_factor*z*sin_y_rot;
 sy = scale_factor*x*sin_x_rot*sin_y_rot+scale_factor*y*cos_x_rot-scale_factor*z*sin_x_rot*cos_y_rot; 
 
-sim_set->center_screen_x = 0.5*sim_set->res_x + sx;
+sim_set->center_screen_x = 0.5*sim_set->res_x - sx;
 sim_set->center_screen_y = 0.5*sim_set->res_y - sy;
 
 }
@@ -138,15 +138,6 @@ while(SDL_PollEvent(&event)){
 		case SDL_KEYDOWN:
 			{
 			switch(event.key.keysym.sym){
-				case SDLK_KP_PLUS:
-					if( 2.*sim_set->timestep <= sim_set->timestep_max ){
-						sim_set->timestep = sim_set->timestep * 2.;
-					}
-				break;
-
-				case SDLK_KP_MINUS:
-					sim_set->timestep = sim_set->timestep * 0.5;
-				break;
 
 				case SDLK_o:
 					sim_set->center_screen_x = 0.5*sim_set->res_x;
@@ -362,6 +353,7 @@ load_texture(renderer, &sim_set->icon_sun, "sprites/sun_icon.bmp");
 load_texture(renderer, &sim_set->icon_jupiter, "sprites/jupiter_icon.bmp");
 load_texture(renderer, &sim_set->icon_earth, "sprites/earth_icon.bmp");
 load_texture(renderer, &sim_set->icon_mercury, "sprites/mercury_icon.bmp");
+load_texture(renderer, &sim_set->icon_neptune, "sprites/neptune_icon.bmp");
 
 }
 
@@ -385,6 +377,7 @@ switch(object->icon_num) {
 	case 1: SDL_RenderCopy(renderer, sim_set->icon_mercury, NULL, &stretchRect) ; break;
 	case 3: SDL_RenderCopy(renderer, sim_set->icon_earth, NULL, &stretchRect) ; break;
 	case 5: SDL_RenderCopy(renderer, sim_set->icon_jupiter, NULL, &stretchRect) ; break;
+	case 8: SDL_RenderCopy(renderer, sim_set->icon_neptune, NULL, &stretchRect) ; break;
 	default: SDL_RenderCopy(renderer, sim_set->icon_sun, NULL, &stretchRect) ; break;
 }
 

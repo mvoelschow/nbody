@@ -113,11 +113,10 @@ acc[2] = a_z;
 
 void rkn5_step(planet objects[], settings *sim_set){
 
-int i, j, k;
+int i, j, k, recalculate;
 const int n=7;
 
 double acc[3];
-double pos_eps[3];
 
 double fx[sim_set->n_bodies][n];
 double fy[sim_set->n_bodies][n];
@@ -125,7 +124,7 @@ double fz[sim_set->n_bodies][n];
 
 const double c[6]={11./240., 0., 108./475., 8./45., 125./2736., 1./300.};
 const double c_dot[6]={1./24., 0., 27./95., 1./3., 125./456., 1./15.};
-double fe[3], fe_min, dt_new, dt_new_guess;
+double dt_new=1.e100;
 
 const double alpha[7]={0., 1./12., 1./6., 0.5, 0.8, 1., 1.};
 const double gamma[7][6]={	{0., 0., 0., 0., 0., 0.},
@@ -139,9 +138,6 @@ const double gamma[7][6]={	{0., 0., 0., 0., 0., 0.},
 const double dt=sim_set->timestep * 86400.;
 const double dtoau=dt/AU, dte_3=dt*1.e-3, dte_3dtoau=dte_3*dtoau;
 const double c5dte_3dtoau = c[5]*dte_3dtoau;
-
-// Just some crazy high initial guess
-dt_new = 1.e100;
 
 // Set number of threads
 omp_set_num_threads(sim_set->n_threads);
@@ -199,6 +195,7 @@ for(i=0; i<n; i++){
 }
 
 // Store new positions in temporary variables and calculate the truncation error estimate
+#pragma omp parallel for schedule(static) default (none) shared(sim_set, objects, fx, fy, fz, recalculate) reduction(min: dt_new)
 for(k=0; k<sim_set->n_bodies; k++){
 
 	// AU
@@ -212,58 +209,16 @@ for(k=0; k<sim_set->n_bodies; k++){
 	objects[k].vel_new[2] = objects[k].vel[2] + objects[k].cdotifi[2]*dte_3;
 
 	// Positional truncation error
-	pos_eps[0] = c5dte_3dtoau*(fx[k][5]-fx[k][6]);
-	pos_eps[1] = c5dte_3dtoau*(fy[k][5]-fy[k][6]);
-	pos_eps[2] = c5dte_3dtoau*(fz[k][5]-fz[k][6]);
+	objects[k].pos_eps[0] = c5dte_3dtoau*(fx[k][5]-fx[k][6]);
+	objects[k].pos_eps[1] = c5dte_3dtoau*(fy[k][5]-fy[k][6]);
+	objects[k].pos_eps[2] = c5dte_3dtoau*(fz[k][5]-fz[k][6]);
 
 	// Calculate total error
-	fe[0] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[0])/fabs(pos_eps[0]);
-	fe[1] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[1])/fabs(pos_eps[1]);
-	fe[2] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[2])/fabs(pos_eps[2]);
+	objects[k].fe[0] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[0])/fabs(objects[k].pos_eps[0]);
+	objects[k].fe[1] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[1])/fabs(objects[k].pos_eps[1]);
+	objects[k].fe[2] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[2])/fabs(objects[k].pos_eps[2]);
 
-	// Find largest error
-	fe_min = fe[0];
-
-	if ( fe[1] < fe_min ){
-		fe_min = fe[1];
-		if ( fe[2] < fe_min ){
-			fe_min = fe[2];
-		}
-	}
-
-	if ( sim_set->timestep_smoothing > 1. ){
-		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*pow(fe_min, 1./sim_set->timestep_smoothing)));
-	}
-	else{
-		dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*fe_min));
-	}
-
-	// Chose the smallest timestep estimate for the next step
-	if ( dt_new_guess < dt_new ) dt_new = dt_new_guess;
-
-	// Check error thresholds
-	if( fe_min < 1. ){
-		// Chose new timestep
-		sim_set->timestep = dt_new;
-		// Clear numercis
-		clear_numerics(objects, sim_set);
-		// Indicate that no new position and velocity values have been applied
-		return;
-	}
-
-}
-
-// All particles passed the error check. Assign new values to final variables and clear numerics
-#pragma omp parallel for schedule(static) default (none) shared(sim_set, objects)
-for(k=0;k<sim_set->n_bodies;k++){
-	objects[k].pos[0] = objects[k].pos_new[0];
-	objects[k].pos[1] = objects[k].pos_new[1];
-	objects[k].pos[2] = objects[k].pos_new[2];
-
-	objects[k].vel[0] = objects[k].vel_new[0];
-	objects[k].vel[1] = objects[k].vel_new[1];
-	objects[k].vel[2] = objects[k].vel_new[2];
-
+	// Clear numerics
 	objects[k].cifi[0] = 0;
 	objects[k].cifi[1] = 0;
 	objects[k].cifi[2] = 0;
@@ -272,18 +227,65 @@ for(k=0;k<sim_set->n_bodies;k++){
 	objects[k].cdotifi[1] = 0;
 	objects[k].cdotifi[2] = 0;
 
+	// Find largest error
+	objects[k].fe_min = objects[k].fe[0];
+
+	if ( objects[k].fe[1] < objects[k].fe_min ){
+		objects[k].fe_min = objects[k].fe[1];
+		if ( objects[k].fe[2] < objects[k].fe_min ){
+			objects[k].fe_min = objects[k].fe[2];
+		}
+	}
+
+	if ( sim_set->timestep_smoothing > 1. ){
+		objects[k].dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*pow(objects[k].fe_min, 1./sim_set->timestep_smoothing)));
+	}
+	else{
+		objects[k].dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*objects[k].fe_min));
+	}
+
+	// Chose the smallest timestep estimate for the next step
+	if ( objects[k].dt_new_guess < dt_new ) dt_new = objects[k].dt_new_guess;
+
+	// Check error thresholds
+	if( objects[k].fe_min < 1. ){
+	recalculate=1;
+	}
+
 }
 
-// Increment timestep counter
-sim_set->timestep_counter = sim_set->timestep_counter + 1;
-// Increment time according to old timestep
-sim_set->time = sim_set->time + sim_set->timestep;
-// Update timestep
-sim_set->timestep = dt_new;
-return;
+if ( recalculate == 1 ) {
+	// Update timestep size
+	sim_set->timestep = dt_new;
+	// That's it. Start over again with the new stepsize
+	return;
+}
+else{
+
+	// All particles passed the error check. Assign new values to final variables and clear numerics
+	#pragma omp parallel for schedule(static) default (none) shared(sim_set, objects)
+	for(k=0;k<sim_set->n_bodies;k++){
+		objects[k].pos[0] = objects[k].pos_new[0];
+		objects[k].pos[1] = objects[k].pos_new[1];
+		objects[k].pos[2] = objects[k].pos_new[2];
+
+		objects[k].vel[0] = objects[k].vel_new[0];
+		objects[k].vel[1] = objects[k].vel_new[1];
+		objects[k].vel[2] = objects[k].vel_new[2];
+
+	}
+
+	// Increment timestep counter
+	sim_set->timestep_counter = sim_set->timestep_counter + 1;
+	// Increment time according to old timestep
+	sim_set->time = sim_set->time + sim_set->timestep;
+	// Update timestep size
+	sim_set->timestep = dt_new;
+	return;
 
 }
 
+}
 
 
 void adaptive_rkn5_step(planet objects[], settings *sim_set){
