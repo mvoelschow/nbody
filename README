@@ -40,6 +40,9 @@ Current release: 0.2 ALPHA
 		- RKN5 parallelized
 		- Number of threads can be specified
 		- Code cleanups 
+		- examples.c added
+
+06.02.2017:	- New example setup added
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".
