@@ -122,6 +122,7 @@ void setup_asteroid_belt_and_planet(planet objects[], settings *sim_set);
 void setup_planetesimals(planet objects[], settings *sim_set);
 void setup_planetary_system(planet objects[], settings *sim_set);
 void setup_stellar_filament(planet objects[], settings *sim_set);
+void setup_stellar_sphere(planet objects[], settings *sim_set);
 
 // From num.c
 void clear_numerics(planet objects[], settings *sim_set);

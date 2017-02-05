@@ -32,7 +32,7 @@ sim_set->eps_vel_thresh = 1.E-16;
 sim_set->eps_pos_thresh = 1.E-16;
 
 // Maximum relative deviation from the system's initial energy budget
-sim_set->check_delta_E = 1;
+sim_set->check_delta_E = 0;
 sim_set->delta_E_thresh = 0.01;
 
 // Timestep smoothing. Improves performance at the cost of some precision loss
@@ -64,16 +64,16 @@ sim_set->res_y = 800;
 sim_set->fullscreen = 0;
 
 // Scale setting on startup [AU]
-sim_set->scale = 20.;
+sim_set->scale = 16.;
 
 // Lowest scale setting [AU]
-sim_set->scale_min = 1.;
+sim_set->scale_min = 0.1;
 
 // Largest scale setting [AU]
 sim_set->scale_max = 100.;
 
 // Draw background
-sim_set->draw_background = 0;
+sim_set->draw_background = 1;
 
 // VSYNC on/off (framerate cap at 60 FPS)
 sim_set->vsync = 0;
@@ -89,7 +89,7 @@ sim_set->focus_on_cms = 1;
 // Data output
 // *******************************
 // Time interval for automatic data output
-sim_set->output_interval = 1.*YR;
+sim_set->output_interval = 0.1*YR;
 
 // Automatically output screenshots
 sim_set->auto_screenshot = 0;
@@ -98,7 +98,7 @@ sim_set->auto_screenshot = 0;
 sim_set->auto_textfile = 0;
 
 // Output evolution of the system's total energy
-sim_set->output_delta_E = 1;
+sim_set->output_delta_E = 0;
 
 
 // *******************************
@@ -130,12 +130,12 @@ sim_set->y_rot = 0.;
 // ***********************************************************
 // Init bodies
 // ***********************************************************
-// N-1 asteroids and a massive planet orbiting the sun
 void init_bodies(planet objects[], settings *sim_set){
 
 setup_asteroid_belt_and_planet(objects, sim_set);
 //setup_planetesimals(objects, sim_set);
 //setup_planetary_system(objects, sim_set);
 //setup_stellar_filament(objects, sim_set);
+//setup_stellar_sphere(objects, sim_set);
 
 }

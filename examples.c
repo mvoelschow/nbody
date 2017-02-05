@@ -296,3 +296,48 @@ objects[i].ident = i;
 }
 
 }
+
+
+
+
+// ***********************************************************
+// Template for stars randomly distributed (in r and phi) within a sphere
+// ***********************************************************
+void setup_stellar_sphere(planet objects[], settings *sim_set){
+int i;
+double r, phi, theta;
+
+for(i=0; i<sim_set->n_bodies; i++){
+
+// Set body mass [kg]
+objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
+objects[i].icon_num = 0;
+objects[i].icon_size = 8;
+
+r = 25.*PC*randomDouble();
+phi = randomDouble()*2.*PI;
+theta = randomDouble()*2.*PI;
+
+// Set body position [AU]
+// x component
+objects[i].pos[0] = r*sin(theta)*cos(phi);
+// y component
+objects[i].pos[1] = r*sin(theta)*sin(phi);
+// z component
+objects[i].pos[2] = r*cos(theta);
+
+// Set body velocity [km/s]
+// x component
+objects[i].vel[0] = 0.001*(2.*randomDouble()-1.);
+// y component
+objects[i].vel[1] = 0.001*(2.*randomDouble()-1.);
+// z component
+objects[i].vel[2] = 0.001*(2.*randomDouble()-1.);
+
+
+// Set identifier [DO NOT CHANGE]
+objects[i].ident = i;
+
+}
+
+}
