@@ -8,7 +8,7 @@ n-body simulations for both scientific and educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.2.1 ALPHA
+Current release: 0.2.2 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -43,6 +43,10 @@ Current release: 0.2.1 ALPHA
 		- examples.c added
 
 06.02.2017:	- New example setup added
+
+09.02.2017:	- Barnes-Hut tree algorithm implementation started
+		- Benchmark mode added
+		- RKN6 implemented
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".

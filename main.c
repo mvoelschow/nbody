@@ -187,6 +187,7 @@ while(!done){
 
 		switch(sim_set.integrator) {
 			case 5: adaptive_rkn5_step(objects, &sim_set); break;
+			case 6: adaptive_rkn6_step(objects, &sim_set); break;
 			default: adaptive_rkn5_step(objects, &sim_set); break;
 		}
 	}

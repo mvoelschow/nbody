@@ -30,14 +30,14 @@ sim_set->n_bodies = 200;
 // *******************************
 
 // Integrator order {5}
-sim_set->integrator = 5;
+sim_set->integrator = 6;
 
 // Maximum relative error per step for position and velocity
 sim_set->eps_vel_thresh = 1.E-16;
 sim_set->eps_pos_thresh = 1.E-16;
 
 // Maximum relative deviation from the system's initial energy budget
-sim_set->check_delta_E = 0;
+sim_set->check_delta_E = 1;
 sim_set->delta_E_thresh = 0.01;
 
 // Timestep smoothing. Improves performance at the cost of some precision loss
@@ -55,7 +55,7 @@ sim_set->n_threads = 1;
 sim_set->timestep_max = 100.;
 
 // Time at which the simulation ends [days]
-sim_set->time_end = 1.E5*YR;
+sim_set->time_end = 1.E2*YR;
 
 
 // *******************************

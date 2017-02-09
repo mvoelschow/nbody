@@ -133,6 +133,7 @@ void setup_stellar_sphere(planet objects[], settings *sim_set);
 void clear_numerics(planet objects[], settings *sim_set);
 double get_total_energy(planet objects[], settings *sim_set);
 void adaptive_rkn5_step(planet objects[], settings *sim_set);
+void adaptive_rkn6_step(planet objects[], settings *sim_set);
 
 // From output.c
 void Generate_Output_File( planet objects[], settings *sim_set );
