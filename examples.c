@@ -42,11 +42,11 @@ objects[1].icon_size = 12;
 r_planet = 6.; // [au]
 
 // Place sun and planet on a proper orbit around their barycentre
-objects[0].pos[0] = -r_planet * objects[1].mass / objects[0].mass;
+objects[0].pos[0] = -r_planet * objects[1].mass / (objects[0].mass+objects[1].mass);
 objects[0].pos[1] = 0.;
 objects[0].pos[2] = 0.;
 
-objects[1].pos[0] = r_planet - r_planet * objects[1].mass/ objects[0].mass;
+objects[1].pos[0] = r_planet + objects[0].pos[0];
 objects[1].pos[1] = 0;
 objects[1].pos[2] = 0.;
 

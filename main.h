@@ -61,6 +61,12 @@ double zoom_factor;
 int vsync;
 int integrator;
 int interactive_mode;
+int benchmark_mode;
+
+// Barns-Hut stuff
+int treesize;
+
+// SDL stuff
 SDL_Texture *icon_sun;
 SDL_Texture *icon_jupiter;
 SDL_Texture *icon_earth;
@@ -99,7 +105,6 @@ int ident;
 int icon_num;
 double icon_size;
 } planet;
-
 
 
 // Prototypes

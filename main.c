@@ -70,6 +70,33 @@ clear_numerics(objects, &sim_set);
 
 
 // ***********************************************************
+//   Benchmark mode
+// ***********************************************************
+if ( sim_set.benchmark_mode == 1 ) {
+
+	// Event loop
+	while(!done){
+
+		// Update bodies
+		switch(sim_set.integrator) {
+			case 5: adaptive_rkn5_step(objects, &sim_set); break;
+			default: adaptive_rkn5_step(objects, &sim_set); break;
+		}
+
+		// Check for simulation end
+		if ( sim_set.time >= sim_set.time_end && sim_set.finished == 0 ){
+		done = 1;
+		}
+
+	}
+
+exit(0);
+
+}
+
+
+
+// ***********************************************************
 // initialize SDL2 and set up window
 // ***********************************************************
 
@@ -92,7 +119,7 @@ TTF_Font *fntCourier = TTF_OpenFont( "fonts/HighlandGothicFLF.ttf", 36 );
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-	window = SDL_CreateWindow("nbody 0.2.1 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.2.2 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -102,7 +129,7 @@ if ( sim_set.fullscreen == 0 ){
 }
 else{
 
-	window = SDL_CreateWindow("nbody 0.2.1 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.2.2 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -164,7 +191,7 @@ while(!done){
 		}
 	}
 
-
+	// Update screen
 	if ( sim_set.time >= sim_set.time_output || sim_set.interactive_mode == 1 || sim_set.paused == 1) {
 
 		// Draw background

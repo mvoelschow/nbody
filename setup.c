@@ -13,6 +13,11 @@
 //   Initialize settings
 // ***********************************************************
 void init_settings(settings *sim_set){
+// *******************************
+// Benchmark mode: No output, no checks, maximum CPU stress
+// *******************************
+sim_set->benchmark_mode = 0;
+
 
 // *******************************
 // Total number of particles to simulate
@@ -50,7 +55,7 @@ sim_set->n_threads = 1;
 sim_set->timestep_max = 100.;
 
 // Time at which the simulation ends [days]
-sim_set->time_end = 1.E3*YR;
+sim_set->time_end = 1.E5*YR;
 
 
 // *******************************
