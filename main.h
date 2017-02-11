@@ -128,12 +128,15 @@ void setup_planetesimals(planet objects[], settings *sim_set);
 void setup_planetary_system(planet objects[], settings *sim_set);
 void setup_stellar_filament(planet objects[], settings *sim_set);
 void setup_stellar_sphere(planet objects[], settings *sim_set);
+void setup_benchmark(planet objects[], settings *sim_set);
 
 // From num.c
 void clear_numerics(planet objects[], settings *sim_set);
 double get_total_energy(planet objects[], settings *sim_set);
 void adaptive_rkn5_step(planet objects[], settings *sim_set);
 void adaptive_rkn6_step(planet objects[], settings *sim_set);
+//void adaptive_rkn7_step(planet objects[], settings *sim_set);
+//void adaptive_rkn8_step(planet objects[], settings *sim_set);
 
 // From output.c
 void Generate_Output_File( planet objects[], settings *sim_set );
@@ -154,3 +157,4 @@ void Render_Screen(SDL_Renderer *renderer);
 // From setup.c
 void init_settings(settings *sim_set);
 void init_bodies(planet objects[], settings *sim_set);
+void init_benchmark(settings *sim_set);

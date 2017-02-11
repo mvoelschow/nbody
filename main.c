@@ -30,11 +30,44 @@ planet *objects;
 // Initialize random number generator
 srand(time(NULL));
 
-
 // ***********************************************************
 //   Initialize simulation settings
 // ***********************************************************
 init_settings(&sim_set);
+
+
+// ***********************************************************
+//   Shortcut for benchmark mode
+// ***********************************************************
+if ( sim_set.benchmark_mode == 1 ) {
+
+init_benchmark(&sim_set);
+objects = (planet *)malloc(sizeof(planet)*sim_set.n_bodies);
+setup_benchmark(objects,&sim_set);
+sim_set.time = 0.;
+clear_numerics(objects, &sim_set);
+
+	// Event loop
+	while(!done){
+
+		// Update bodies
+		switch(sim_set.integrator) {
+			case 5: adaptive_rkn5_step(objects, &sim_set); break;
+			case 6: adaptive_rkn6_step(objects, &sim_set); break;
+			default: adaptive_rkn5_step(objects, &sim_set); break;
+		}
+
+		// Check for simulation end
+		if ( sim_set.time >= sim_set.time_end && sim_set.finished == 0 ){
+		done = 1;
+		}
+
+	}
+
+exit(0);
+
+}
+
 
 
 // ***********************************************************
@@ -69,30 +102,7 @@ sim_set.time = 0.;
 clear_numerics(objects, &sim_set);
 
 
-// ***********************************************************
-//   Benchmark mode
-// ***********************************************************
-if ( sim_set.benchmark_mode == 1 ) {
 
-	// Event loop
-	while(!done){
-
-		// Update bodies
-		switch(sim_set.integrator) {
-			case 5: adaptive_rkn5_step(objects, &sim_set); break;
-			default: adaptive_rkn5_step(objects, &sim_set); break;
-		}
-
-		// Check for simulation end
-		if ( sim_set.time >= sim_set.time_end && sim_set.finished == 0 ){
-		done = 1;
-		}
-
-	}
-
-exit(0);
-
-}
 
 
 
@@ -119,7 +129,7 @@ TTF_Font *fntCourier = TTF_OpenFont( "fonts/HighlandGothicFLF.ttf", 36 );
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-	window = SDL_CreateWindow("nbody 0.2.2 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.2.3 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -129,7 +139,7 @@ if ( sim_set.fullscreen == 0 ){
 }
 else{
 
-	window = SDL_CreateWindow("nbody 0.2.2 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.2.3 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -188,6 +198,8 @@ while(!done){
 		switch(sim_set.integrator) {
 			case 5: adaptive_rkn5_step(objects, &sim_set); break;
 			case 6: adaptive_rkn6_step(objects, &sim_set); break;
+//			case 7: adaptive_rkn7_step(objects, &sim_set); break;
+//			case 8: adaptive_rkn8_step(objects, &sim_set); break;
 			default: adaptive_rkn5_step(objects, &sim_set); break;
 		}
 	}

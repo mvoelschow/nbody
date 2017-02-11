@@ -341,3 +341,64 @@ objects[i].ident = i;
 }
 
 }
+
+
+
+// ***********************************************************
+// Benchmark template for a cubic filament of stars aligned on a grid
+// ***********************************************************
+void setup_benchmark(planet objects[], settings *sim_set){
+int i, j, k, n;
+double x_start, y_start, z_start, delta;
+
+x_start = -10.*PC;
+y_start = -10.*PC;
+z_start = -10.*PC;
+
+delta = 1.*PC;
+
+j=-1;
+k=0;
+n=0;
+
+for(i=0; i<sim_set->n_bodies; i++){
+
+// Set body mass [kg]
+objects[i].mass = 0.1*(double)(j+2)*M_SUN;
+objects[i].icon_num = 0;
+objects[i].icon_size = 8;
+
+// Set identifier [DO NOT CHANGE]
+objects[i].ident = i;
+
+j++;
+if ( j>19 ) {
+	j=0;
+	k++;
+}
+
+if ( k>19 ) {
+	k=0;
+	n++;
+}
+
+// Set body position [AU]
+// x component
+objects[i].pos[0] = x_start + (double)j*delta;
+// y component
+objects[i].pos[1] = y_start + (double)k*delta;
+// z component
+objects[i].pos[2] = z_start + (double)n*delta;
+
+// Set body velocity [km/s]
+// x component
+objects[i].vel[0] = 0.;
+// y component
+objects[i].vel[1] = 0.;
+// z component
+objects[i].vel[2] = 0.;
+
+
+}
+
+}

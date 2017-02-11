@@ -18,6 +18,9 @@ void init_settings(settings *sim_set){
 // *******************************
 sim_set->benchmark_mode = 0;
 
+// Number of threads to use
+sim_set->n_threads = 1;
+
 
 // *******************************
 // Total number of particles to simulate
@@ -29,7 +32,7 @@ sim_set->n_bodies = 200;
 // Numerics
 // *******************************
 
-// Integrator order {5}
+// Integrator order {5,6,7}
 sim_set->integrator = 6;
 
 // Maximum relative error per step for position and velocity
@@ -42,9 +45,6 @@ sim_set->delta_E_thresh = 0.01;
 
 // Timestep smoothing. Improves performance at the cost of some precision loss
 sim_set->timestep_smoothing = 1.;
-
-// Number of threads to use
-sim_set->n_threads = 1;
 
 
 // *******************************
@@ -142,5 +142,59 @@ setup_asteroid_belt_and_planet(objects, sim_set);
 //setup_planetary_system(objects, sim_set);
 //setup_stellar_filament(objects, sim_set);
 //setup_stellar_sphere(objects, sim_set);
+//setup_benchmark(objects, sim_set);
 
+}
+
+
+
+
+
+
+// ***********************************************************
+//   Initialize benchmark
+// ***********************************************************
+void init_benchmark(settings *sim_set){
+
+sim_set->benchmark_mode = 1;
+sim_set->n_bodies = 8000;
+sim_set->eps_vel_thresh = 1.E-16;
+sim_set->eps_pos_thresh = 1.E-16;
+sim_set->check_delta_E = 0;
+sim_set->delta_E_thresh = 0.01;
+sim_set->timestep_smoothing = 1.;
+sim_set->timestep_max = 100.;
+sim_set->time_end = 2.E4*YR;
+sim_set->res_x = 800;
+sim_set->res_y = 800;
+sim_set->fullscreen = 0;
+sim_set->scale = 16.;
+sim_set->scale_min = 0.1;
+sim_set->scale_max = 100.;
+sim_set->draw_background = 0;
+sim_set->vsync = 0;
+sim_set->interactive_mode = 0;
+sim_set->focus_on_cms = 1;
+sim_set->output_interval = 1.E2*YR;
+sim_set->auto_screenshot = 0;
+sim_set->auto_textfile = 0;
+sim_set->output_delta_E = 0;
+sim_set->center_screen_x = 0.5*sim_set->res_x;
+sim_set->center_screen_y = 0.5*sim_set->res_y;
+sim_set->timestep = 0.1;
+sim_set->select_box_size = 40;
+sim_set->selected_object = -1;
+sim_set->scale_step = 1.05;
+sim_set->paused = 1;
+sim_set->auto_timestep = 1;
+sim_set->finished = 0;
+sim_set->screenshot_counter = 0;
+sim_set->screenshot_trigger = 1;
+sim_set->auto_screenshot_counter = 0;
+sim_set->auto_file_counter = 0;
+sim_set->time_output = 0.;
+sim_set->timestep_counter = 0;
+sim_set->x_rot = 0.;
+sim_set->y_rot = 0.;
+      
 }
