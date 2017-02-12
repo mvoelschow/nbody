@@ -113,6 +113,186 @@ acc[2] = a_z;
 
 
 
+void adaptive_rkn4_step(planet objects[], settings *sim_set){
+
+int i, j, k, recalculate=0;
+static const int n=5;
+
+double acc[3];
+double alphai_dtoau;
+
+double fx[sim_set->n_bodies][n];
+double fy[sim_set->n_bodies][n];
+double fz[sim_set->n_bodies][n];
+
+static const double c[4]={13./120., 0.3, 3./40., 1./60.};
+static const double c_dot[4]={0.125, 0.375, 0.375, 0.125};
+double dt_new=1.e100;
+
+static const double alpha[5]={0., 1./3., 2./3., 1., 1.};
+static const double gamma[5][4]={	{0., 0., 0., 0.},
+					{1./18., 0., 0., 0.},
+					{0., 2./9., 0., 0.},
+					{1./3., 0., 1./6., 0.},
+					{13./120., 0.3, 3./40., 1./60.} };
+
+const double dt=sim_set->timestep * 86400.;
+const double dtoau=dt/AU, dte_3=dt*1.e-3, dte_3dtoau=dte_3*dtoau;
+const double c3dte_3dtoau = c[3]*dte_3dtoau;
+
+// Set number of threads
+omp_set_num_threads(sim_set->n_threads);
+
+// Calculate f_i values
+for(i=0; i<n; i++){
+
+	// Assign positions for the i-th evaluation of the acceleration function
+	#pragma omp parallel for schedule(static) default (none) shared(objects, sim_set, i, fx, fy, fz, alphai_dtoau) private(j)
+	for(k=0; k<sim_set->n_bodies; k++){
+
+		objects[k].d[0]=0.;
+		objects[k].d[1]=0.;
+		objects[k].d[2]=0.;	
+		
+		for(j=0; j<i; j++){
+			// m/s²
+			objects[k].d[0] += gamma[i][j]*fx[k][j];
+			objects[k].d[1] += gamma[i][j]*fy[k][j];
+			objects[k].d[2] += gamma[i][j]*fz[k][j];
+		}
+
+		// AU
+		alphai_dtoau = alpha[i]*dtoau;
+		objects[k].pos_new[0] = objects[k].pos[0] + objects[k].vel[0]*alphai_dtoau + objects[k].d[0]*dte_3dtoau;
+		objects[k].pos_new[1] = objects[k].pos[1] + objects[k].vel[1]*alphai_dtoau + objects[k].d[1]*dte_3dtoau;
+		objects[k].pos_new[2] = objects[k].pos[2] + objects[k].vel[2]*alphai_dtoau + objects[k].d[2]*dte_3dtoau;
+
+	}
+
+	// Evaluate the acceleration function for all particles 
+	#pragma omp parallel for schedule(static) default (none) shared(objects, sim_set, fx, fy, fz, i) private(acc)
+	for(k=0; k<sim_set->n_bodies; k++){
+
+		get_acc_vector(objects, sim_set, k, acc);
+
+		// m/s²
+		fx[k][i] = acc[0];
+		fy[k][i] = acc[1];
+		fz[k][i] = acc[2];
+
+		// Increment the interaction sums
+		if(i<n-1){
+			// m/s² for all three blocks
+			objects[k].cifi[0] += fx[k][i]*c[i];
+			objects[k].cifi[1] += fy[k][i]*c[i];
+			objects[k].cifi[2] += fz[k][i]*c[i];
+	
+			objects[k].cdotifi[0] += fx[k][i]*c_dot[i];
+			objects[k].cdotifi[1] += fy[k][i]*c_dot[i];
+			objects[k].cdotifi[2] += fz[k][i]*c_dot[i];
+		}
+	
+	}
+
+}
+
+// Store new positions in temporary variables and calculate the truncation error estimate
+#pragma omp parallel for schedule(static) default (none) shared(sim_set, objects, fx, fy, fz, recalculate) reduction(min: dt_new)
+for(k=0; k<sim_set->n_bodies; k++){
+
+	// AU
+	objects[k].pos_new[0] = objects[k].pos[0] + objects[k].vel[0]*dtoau + objects[k].cifi[0]*dte_3dtoau;
+	objects[k].pos_new[1] = objects[k].pos[1] + objects[k].vel[1]*dtoau + objects[k].cifi[1]*dte_3dtoau;
+	objects[k].pos_new[2] = objects[k].pos[2] + objects[k].vel[2]*dtoau + objects[k].cifi[2]*dte_3dtoau;
+
+	// km/s
+	objects[k].vel_new[0] = objects[k].vel[0] + objects[k].cdotifi[0]*dte_3;
+	objects[k].vel_new[1] = objects[k].vel[1] + objects[k].cdotifi[1]*dte_3;
+	objects[k].vel_new[2] = objects[k].vel[2] + objects[k].cdotifi[2]*dte_3;
+
+	// Positional truncation error
+	objects[k].pos_eps[0] = c3dte_3dtoau*(fx[k][3]-fx[k][4]);
+	objects[k].pos_eps[1] = c3dte_3dtoau*(fy[k][3]-fy[k][4]);
+	objects[k].pos_eps[2] = c3dte_3dtoau*(fz[k][3]-fz[k][4]);
+
+	// Calculate total error
+	objects[k].fe[0] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[0])/fabs(objects[k].pos_eps[0]);
+	objects[k].fe[1] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[1])/fabs(objects[k].pos_eps[1]);
+	objects[k].fe[2] = sim_set->eps_pos_thresh*fabs(objects[k].pos_new[2])/fabs(objects[k].pos_eps[2]);
+
+	// Clear numerics
+	objects[k].cifi[0] = 0;
+	objects[k].cifi[1] = 0;
+	objects[k].cifi[2] = 0;
+
+	objects[k].cdotifi[0] = 0;
+	objects[k].cdotifi[1] = 0;
+	objects[k].cdotifi[2] = 0;
+
+	// Find largest error
+	objects[k].fe_min = objects[k].fe[0];
+
+	if ( objects[k].fe[1] < objects[k].fe_min ){
+		objects[k].fe_min = objects[k].fe[1];
+		if ( objects[k].fe[2] < objects[k].fe_min ){
+			objects[k].fe_min = objects[k].fe[2];
+		}
+	}
+
+	if ( sim_set->timestep_smoothing > 1. ){
+		objects[k].dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*pow(objects[k].fe_min, 1./sim_set->timestep_smoothing)));
+	}
+	else{
+		objects[k].dt_new_guess = sim_set->timestep * fmin(2., fmax(0.2,0.9*objects[k].fe_min));
+	}
+
+	// Chose the smallest timestep estimate for the next step
+	if ( objects[k].dt_new_guess < dt_new ) dt_new = objects[k].dt_new_guess;
+
+	// Check error thresholds
+	if( objects[k].fe_min < 1. ){
+	recalculate=1;
+	}
+
+}
+
+if ( recalculate == 1 ) {
+	// Update timestep size
+	sim_set->timestep = dt_new;
+	// That's it. Start over again with the new stepsize
+	return;
+}
+else{
+
+	// All particles passed the error check. Assign new values to final variables and clear numerics
+	#pragma omp parallel for schedule(static) default (none) shared(sim_set, objects)
+	for(k=0;k<sim_set->n_bodies;k++){
+		objects[k].pos[0] = objects[k].pos_new[0];
+		objects[k].pos[1] = objects[k].pos_new[1];
+		objects[k].pos[2] = objects[k].pos_new[2];
+
+		objects[k].vel[0] = objects[k].vel_new[0];
+		objects[k].vel[1] = objects[k].vel_new[1];
+		objects[k].vel[2] = objects[k].vel_new[2];
+
+	}
+
+	// Increment timestep counter
+	sim_set->timestep_counter = sim_set->timestep_counter + 1;
+	// Increment time according to old timestep
+	sim_set->time = sim_set->time + sim_set->timestep;
+	// Update timestep size
+	sim_set->timestep = dt_new;
+	return;
+
+}
+
+}
+
+
+
+
+
 void adaptive_rkn5_step(planet objects[], settings *sim_set){
 
 int i, j, k, recalculate=0;

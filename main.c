@@ -52,9 +52,10 @@ clear_numerics(objects, &sim_set);
 
 		// Update bodies
 		switch(sim_set.integrator) {
+			case 4: adaptive_rkn4_step(objects, &sim_set); break;
 			case 5: adaptive_rkn5_step(objects, &sim_set); break;
 			case 6: adaptive_rkn6_step(objects, &sim_set); break;
-			default: adaptive_rkn5_step(objects, &sim_set); break;
+			default: adaptive_rkn6_step(objects, &sim_set); break;
 		}
 
 		// Check for simulation end
@@ -196,11 +197,12 @@ while(!done){
 	if ( sim_set.paused != 1 ){
 
 		switch(sim_set.integrator) {
+			case 4: adaptive_rkn4_step(objects, &sim_set); break;
 			case 5: adaptive_rkn5_step(objects, &sim_set); break;
 			case 6: adaptive_rkn6_step(objects, &sim_set); break;
 //			case 7: adaptive_rkn7_step(objects, &sim_set); break;
 //			case 8: adaptive_rkn8_step(objects, &sim_set); break;
-			default: adaptive_rkn5_step(objects, &sim_set); break;
+			default: adaptive_rkn6_step(objects, &sim_set); break;
 		}
 	}
 
