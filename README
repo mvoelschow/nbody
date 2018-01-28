@@ -8,7 +8,7 @@ n-body simulations for both scientific and educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.2.3 ALPHA
+Current release: 0.3 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -20,8 +20,7 @@ Current release: 0.2.3 ALPHA
 
 20.01.2017:	- RKN5 implemented (stability tests pending)
 
-22.01.2017:	- Total energy conservation check implemented (CMS motion not considered yet)
-		- High CPU load in pause mode bug fixed
+22.01.2017:	- High CPU load in pause mode bug fixed
 
 23.01.2017:	- Numerical stats output implemented 
 		- Code cleanups
@@ -45,14 +44,59 @@ Current release: 0.2.3 ALPHA
 06.02.2017:	- New example setups added
 
 09.02.2017:	- Barnes-Hut tree algorithm implementation started
-		- RKN6 implemented
+		- RKN6 implemented and parallelized
 
 11.02.2017:	- Benchmark mode added (calls a pre-defined standard setup)
 
+28.01.2017:	- Live view rotation implemented
+		- 3D rendering mode added
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".
 The GNU C compiler gcc, SDL2 and SDL2_ttf must be present.
+
+### A local SDL2 installation ###
+In case you don't have root priviliges on your machine, the SDL2 library can be installed locally to your home directory.
+
+1. Download the SDL2 source code from https://www.libsdl.org/release/SDL2-2.0.7.zip
+
+2. Unzip it in your home directory
+
+3. Open a console and change to the SDL2-2.0.7 directory
+
+4. Run the configure script: ./configure --prefix=$HOME
+
+5. Compile it: make
+
+6. Install it: make install
+
+Repeat the whole procedere for the SDL2_ttf library:
+
+1. Download the SDL2_ttf source code from
+https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-2.0.14.zip
+
+2. Unzip it in your home directory
+
+3. Open a console and change to the newly created directory SDL2_ttf-2.0.14
+
+4. Run the configure script: ./configure --prefix=$HOME
+
+5. Compile it: make
+
+6. Install it: make install
+
+You'll find three new folders in your home directory (bin, lib, share) which shouldn't mess up too much.
+As a final step, you should add the new library directories to your .bashrc:
+
+1. Open a console in your home directory
+2. Type: gedit .bashrc
+3. Append the following lines:
+
+export LD_LIBRARY_PATH=$HOME/lib
+export PATH="$HOME/bin:$PATH"
+
+4. Save the file, close gedit and close the terminal.
+
 
 ### Running a simulation ###
 At this very early stage of the project, both the settings and the simulation setup are hard-coded in the setup.c module. 

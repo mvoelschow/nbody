@@ -312,7 +312,7 @@ for(i=0; i<sim_set->n_bodies; i++){
 // Set body mass [kg]
 objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
 objects[i].icon_num = 0;
-objects[i].icon_size = 8;
+objects[i].icon_size = 6;
 
 r = 25.*PC*randomDouble();
 phi = randomDouble()*2.*PI;

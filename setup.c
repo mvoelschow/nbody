@@ -19,7 +19,7 @@ void init_settings(settings *sim_set){
 sim_set->benchmark_mode = 0;
 
 // Number of threads to use
-sim_set->n_threads = 1;
+sim_set->n_threads = 2;
 
 
 // *******************************
@@ -39,10 +39,6 @@ sim_set->integrator = 6;
 sim_set->eps_vel_thresh = 1.E-16;
 sim_set->eps_pos_thresh = 1.E-16;
 
-// Maximum relative deviation from the system's initial energy budget
-sim_set->check_delta_E = 0;
-sim_set->delta_E_thresh = 0.01;
-
 // Timestep smoothing. Improves performance at the cost of some precision loss
 sim_set->timestep_smoothing = 1.;
 
@@ -55,7 +51,7 @@ sim_set->timestep_smoothing = 1.;
 sim_set->timestep_max = 100.;
 
 // Time at which the simulation ends [days]
-sim_set->time_end = 1.E2*YR;
+sim_set->time_end = 1.E3*YR;
 
 
 // *******************************
@@ -67,6 +63,8 @@ sim_set->res_y = 800;
 
 // Fullscreen mode on/off
 sim_set->fullscreen = 0;
+
+sim_set->mode_3D = 1;
 
 // Scale setting on startup [AU]
 sim_set->scale = 16.;
@@ -97,7 +95,7 @@ sim_set->focus_on_cms = 1;
 sim_set->output_interval = 0.1*YR;
 
 // Automatically output screenshots
-sim_set->auto_screenshot = 0;
+sim_set->auto_screenshot = 1;
 
 // Automatically output text file with kinetic parameters of all bodies
 sim_set->auto_textfile = 0;
@@ -118,6 +116,7 @@ sim_set->scale_step = 1.05;
 sim_set->paused = 1;
 sim_set->auto_timestep = 1;
 sim_set->finished = 0;
+sim_set->resume = 0;
 sim_set->screenshot_counter = 0;
 sim_set->screenshot_trigger = 1;
 sim_set->auto_screenshot_counter = 0;
@@ -126,6 +125,7 @@ sim_set->time_output = 0.;
 sim_set->timestep_counter = 0;
 sim_set->x_rot = 0.;
 sim_set->y_rot = 0.;
+sim_set->icon_size_max = 30.;
       
 }
 
@@ -160,8 +160,6 @@ sim_set->benchmark_mode = 1;
 sim_set->n_bodies = 8000;
 sim_set->eps_vel_thresh = 1.E-16;
 sim_set->eps_pos_thresh = 1.E-16;
-sim_set->check_delta_E = 0;
-sim_set->delta_E_thresh = 0.01;
 sim_set->timestep_smoothing = 1.;
 sim_set->timestep_max = 100.;
 sim_set->time_end = 2.E4*YR;

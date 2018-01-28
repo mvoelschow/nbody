@@ -37,13 +37,14 @@ double time_output;
 double output_interval;
 int paused;
 int finished;
+int resume;
 double eps_vel_thresh;
 double eps_pos_thresh;
 double m_tot;
 double E_tot_0;
 double E_tot;
 double delta_E_thresh;
-int check_delta_E;
+int mode_3D;
 int output_delta_E;
 double center_screen_x, center_screen_y;
 double start_x, start_y;
@@ -62,6 +63,7 @@ int vsync;
 int integrator;
 int interactive_mode;
 int benchmark_mode;
+double icon_size_max;
 
 // Barns-Hut stuff
 int treesize;
@@ -152,6 +154,7 @@ void Draw_Background(SDL_Renderer *renderer, SDL_Texture *background, settings *
 void load_object_textures(SDL_Renderer *renderer, settings *sim_set);
 int processEvents(settings *sim_set, planet objects[]);
 void render_all_bodies(SDL_Renderer *renderer, planet objects[], settings *sim_set);
+void render_all_bodies_2D(SDL_Renderer *renderer, planet objects[], settings *sim_set);
 void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set);
 void Render_Screen(SDL_Renderer *renderer);
 

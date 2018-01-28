@@ -41,11 +41,11 @@ init_settings(&sim_set);
 // ***********************************************************
 if ( sim_set.benchmark_mode == 1 ) {
 
-init_benchmark(&sim_set);
-objects = (planet *)malloc(sizeof(planet)*sim_set.n_bodies);
-setup_benchmark(objects,&sim_set);
-sim_set.time = 0.;
-clear_numerics(objects, &sim_set);
+	init_benchmark(&sim_set);
+	objects = (planet *)malloc(sizeof(planet)*sim_set.n_bodies);
+	setup_benchmark(objects,&sim_set);
+	sim_set.time = 0.;
+	clear_numerics(objects, &sim_set);
 
 	// Event loop
 	while(!done){
@@ -65,7 +65,7 @@ clear_numerics(objects, &sim_set);
 
 	}
 
-exit(0);
+	exit(0);
 
 }
 
@@ -92,8 +92,8 @@ for(i=0;i<sim_set.n_bodies;i++){
 // ***********************************************************
 //   Calculate initial energy
 // ***********************************************************
-sim_set.E_tot_0 = get_total_energy(objects, &sim_set);
-sim_set.E_tot = sim_set.E_tot_0;
+//sim_set.E_tot_0 = get_total_energy(objects, &sim_set);
+//sim_set.E_tot = sim_set.E_tot_0;
 
 
 // ***********************************************************
@@ -130,7 +130,7 @@ TTF_Font *fntCourier = TTF_OpenFont( "fonts/HighlandGothicFLF.ttf", 36 );
 // Create an application window
 if ( sim_set.fullscreen == 0 ){
 
-	window = SDL_CreateWindow("nbody 0.2.3 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.3 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -140,7 +140,7 @@ if ( sim_set.fullscreen == 0 ){
 }
 else{
 
-	window = SDL_CreateWindow("nbody 0.2.3 ALPHA",		// Window title
+	window = SDL_CreateWindow("nbody 0.3 ALPHA",		// Window title
 				SDL_WINDOWPOS_UNDEFINED,	// Initial x position
 				SDL_WINDOWPOS_UNDEFINED,	// Initial y position
 				sim_set.res_x,			// width [pixels]
@@ -172,8 +172,8 @@ load_object_textures(renderer, &sim_set);
 background_surf = SDL_LoadBMP("sprites/background.bmp");
 
 if(background_surf==NULL){
-printf("Error. Background bitmap not found.");
-SDL_Quit();
+	printf("Error. Background bitmap not found.");
+	SDL_Quit();
 }
 
 background = SDL_CreateTextureFromSurface(renderer, background_surf);
@@ -215,7 +215,12 @@ while(!done){
 		if ( sim_set.focus_on_cms == 1 && sim_set.paused == 0) center_at_cms(&sim_set, objects);
 
 		// Render objects
-		render_all_bodies_3D(renderer, objects, &sim_set);
+		if ( sim_set.mode_3D == 1 ){
+			render_all_bodies_3D(renderer, objects, &sim_set);
+		}
+		else{
+			render_all_bodies_2D(renderer, objects, &sim_set);
+		}
 
 		// Some HUD
 		render_hud(renderer, fntCourier, &sim_set, objects);
@@ -229,11 +234,6 @@ while(!done){
 
 	// Check if automatic output is scheduled
 	if ( sim_set.paused != 1 && sim_set.time >= sim_set.time_output ) {
-	
-		if ( sim_set.check_delta_E == 1 ){
-			sim_set.E_tot = get_total_energy(objects, &sim_set);
-			if ( sim_set.output_delta_E == 1 ) Write_Numerical_Stats(&sim_set);
-		}
 
 		generate_auto_output(renderer, objects, &sim_set);
 		sim_set.time_output += sim_set.output_interval;
@@ -248,17 +248,16 @@ while(!done){
 	// Check for simulation end
 	if ( sim_set.paused == 0 ) {
 
-		if ( sim_set.time >= sim_set.time_end && sim_set.finished == 0 ){
-			sim_set.finished = 1;
-			sim_set.paused = 1;
-		}
-
-		if ( fabs((sim_set.E_tot-sim_set.E_tot_0)/sim_set.E_tot_0) > sim_set.delta_E_thresh ){
+		if ( sim_set.time >= sim_set.time_end && sim_set.finished == 0 && sim_set.resume == 0){
 			sim_set.finished = 1;
 			sim_set.paused = 1;
 		}
 
 	}
+
+	// Wanna continue? Why not ...
+	if ( sim_set.paused == 1  && sim_set.finished == 1 && sim_set.resume == 0) sim_set.resume = 1;
+	
 
 	// Don't burn the CPU in pause mode
 	if ( sim_set.paused == 1 ) SDL_Delay(25);
