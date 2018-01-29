@@ -67,37 +67,37 @@ objects[1].vel[2] = 0.;
 // Planetesimals between 3 and 5 au
 for(i=2; i<sim_set->n_bodies; i=i+1){
 
-// Set body mass [kg]
-objects[i].mass = 1.E19*(99.*randomDouble()+1.);
-objects[i].icon_num = 1;
-objects[i].icon_size = 4;
+	// Set body mass [kg]
+	objects[i].mass = 1.E19*(99.*randomDouble()+1.);
+	objects[i].icon_num = 1;
+	objects[i].icon_size = 4;
 
-r = 3.+2.*randomDouble();
-phi = randomDouble()*2.*PI;
+	r = 3.+2.*randomDouble();
+	phi = randomDouble()*2.*PI;
 
-// Set body position [AU]
-// x component
-objects[i].pos[0] = r*cos(phi);
-// y component
-objects[i].pos[1] = r*sin(phi);
-// z component
-objects[i].pos[2] = 0.1*(2.*randomDouble()-1.);
+	// Set body position [AU]
+	// x component
+	objects[i].pos[0] = r*cos(phi);
+	// y component
+	objects[i].pos[1] = r*sin(phi);
+	// z component
+	objects[i].pos[2] = 0.1*(2.*randomDouble()-1.);
 
-dist = sqrt(objects[i].pos[0]*objects[i].pos[0]+objects[i].pos[1]*objects[i].pos[1]+objects[i].pos[2]*objects[i].pos[2]);
+	dist = sqrt(objects[i].pos[0]*objects[i].pos[0]+objects[i].pos[1]*objects[i].pos[1]+objects[i].pos[2]*objects[i].pos[2]);
 
-v_circ = 1.E-3*sqrt( G_cst * objects[0].mass / (dist*AU*1.E3) );
+	v_circ = 1.E-3*sqrt( G_cst * objects[0].mass / (dist*AU*1.E3) );
 
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = -v_circ*sin(phi);
-// y component
-objects[i].vel[1] = v_circ*cos(phi);
-// z component
-objects[i].vel[2] = 0.;
+	// Set body velocity [km/s]
+	// x component
+	objects[i].vel[0] = -v_circ*sin(phi);
+	// y component
+	objects[i].vel[1] = v_circ*cos(phi);
+	// z component
+	objects[i].vel[2] = 0.;
 
 
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
+	// Set identifier [DO NOT CHANGE]
+	objects[i].ident = i;
 
 }
 
@@ -134,37 +134,36 @@ objects[0].vel[2] = 0.;
 // Planetesimals between 1 and 6 au
 for(i=1; i<sim_set->n_bodies; i=i+1){
 
-// Set body mass [kg]
-objects[i].mass = 1.E19*(99.*randomDouble()+1.);
-objects[i].icon_num = 1;
-objects[i].icon_size = 4;
+	// Set body mass [kg]
+	objects[i].mass = 1.E19*(99.*randomDouble()+1.);
+	objects[i].icon_num = 1;
+	objects[i].icon_size = 4;
 
-r = 1.+5.*randomDouble();
-phi = randomDouble()*2.*PI;
+	r = 1.+5.*randomDouble();
+	phi = randomDouble()*2.*PI;
 
-// Set body position [AU]
-// x component
-objects[i].pos[0] = r*cos(phi);
-// y component
-objects[i].pos[1] = r*sin(phi);
-// z component
-objects[i].pos[2] = 0.1*(2.*randomDouble()-1.);
+	// Set body position [AU]
+	// x component
+	objects[i].pos[0] = r*cos(phi);
+	// y component
+	objects[i].pos[1] = r*sin(phi);
+	// z component
+	objects[i].pos[2] = 0.1*(2.*randomDouble()-1.);
 
-dist = sqrt(objects[i].pos[0]*objects[i].pos[0]+objects[i].pos[1]*objects[i].pos[1]+objects[i].pos[2]*objects[i].pos[2]);
+	dist = sqrt(objects[i].pos[0]*objects[i].pos[0]+objects[i].pos[1]*objects[i].pos[1]+objects[i].pos[2]*objects[i].pos[2]);
 
-v_circ = 1.E-3*sqrt( G_cst * objects[0].mass / (dist*AU*1.E3) );
+	v_circ = 1.E-3*sqrt( G_cst * objects[0].mass / (dist*AU*1.E3) );
 
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = -v_circ*sin(phi);
-// y component
-objects[i].vel[1] = v_circ*cos(phi);
-// z component
-objects[i].vel[2] = 0.;
+	// Set body velocity [km/s]
+	// x component
+	objects[i].vel[0] = -v_circ*sin(phi);
+	// y component
+	objects[i].vel[1] = v_circ*cos(phi);
+	// z component
+	objects[i].vel[2] = 0.;
 
-
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
+	// Set identifier [DO NOT CHANGE]
+	objects[i].ident = i;
 
 }
 
@@ -202,56 +201,59 @@ objects[0].vel[2] = 0.;
 // Planets between 1 and 16 au
 for(i=1; i<sim_set->n_bodies; i=i+1){
 
-// Set body mass [kg]
-objects[i].mass = 1.E23*(9999.*pow(randomDouble(), 3)+1.);
+	// Set body mass [kg]
+	objects[i].mass = 1.E23*(9999.*pow(randomDouble(), 3)+1.);
 
-if ( objects[i].mass <= 1.E24 && objects[i].mass > 1.E23 ){
-// Very small terrestial planet
-objects[i].icon_num = 1;
-objects[i].icon_size = 4;
-}
-if ( objects[i].mass <= 1.E25 && objects[i].mass > 1.E24 ){
-// Terrestial planet
-objects[i].icon_num = 3;
-objects[i].icon_size = 6;
-}
-if ( objects[i].mass <= 2.E26 && objects[i].mass > 1.E25 ){
-// Super-Earth / Neptunian
-objects[i].icon_num = 8;
-objects[i].icon_size = 12;
-}
-if ( objects[i].mass <= 1.E27 && objects[i].mass > 2.E26 ){
-// Jovian
-objects[i].icon_num = 5;
-objects[i].icon_size = 16;
-}
+	if ( objects[i].mass <= 1.E24 && objects[i].mass > 1.E23 ){
+		// Very small terrestial planet
+		objects[i].icon_num = 1;
+		objects[i].icon_size = 4;
+	}
 
-r = 1.+29.*randomDouble();
-phi = randomDouble()*2.*PI;
+	if ( objects[i].mass <= 1.E25 && objects[i].mass > 1.E24 ){
+		// Terrestial planet
+		objects[i].icon_num = 3;
+		objects[i].icon_size = 6;
+	}
 
-// Set body position [AU]
-// x component
-objects[i].pos[0] = r*cos(phi);
-// y component
-objects[i].pos[1] = r*sin(phi);
-// z component
-objects[i].pos[2] = 0.1*(2.*randomDouble()-1.);
+	if ( objects[i].mass <= 2.E26 && objects[i].mass > 1.E25 ){
+	// Super-Earth / Neptunian
+		objects[i].icon_num = 8;
+		objects[i].icon_size = 12;
+	}
 
-dist = sqrt(objects[i].pos[0]*objects[i].pos[0]+objects[i].pos[1]*objects[i].pos[1]+objects[i].pos[2]*objects[i].pos[2]);
+	if ( objects[i].mass <= 1.E27 && objects[i].mass > 2.E26 ){
+	// Jovian
+	objects[i].icon_num = 5;
+	objects[i].icon_size = 16;
+	}
 
-v_circ = 1.E-3*sqrt( G_cst * objects[0].mass / (dist*AU*1.E3) );
+	r = 1.+29.*randomDouble();
+	phi = randomDouble()*2.*PI;
 
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = -v_circ*sin(phi);
-// y component
-objects[i].vel[1] = v_circ*cos(phi);
-// z component
-objects[i].vel[2] = 0.;
+	// Set body position [AU]
+	// x component
+	objects[i].pos[0] = r*cos(phi);
+	// y component
+	objects[i].pos[1] = r*sin(phi);
+	// z component
+	objects[i].pos[2] = 0.1*(2.*randomDouble()-1.);
+
+	dist = sqrt(objects[i].pos[0]*objects[i].pos[0]+objects[i].pos[1]*objects[i].pos[1]+objects[i].pos[2]*objects[i].pos[2]);
+
+	v_circ = 1.E-3*sqrt( G_cst * objects[0].mass / (dist*AU*1.E3) );
+
+	// Set body velocity [km/s]
+	// x component
+	objects[i].vel[0] = -v_circ*sin(phi);
+	// y component
+	objects[i].vel[1] = v_circ*cos(phi);
+	// z component
+	objects[i].vel[2] = 0.;
 
 
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
+	// Set identifier [DO NOT CHANGE]
+	objects[i].ident = i;
 
 }
 
@@ -268,30 +270,30 @@ int i;
 
 for(i=0; i<sim_set->n_bodies; i++){
 
-// Set body mass [kg]
-objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
-objects[i].icon_num = 0;
-objects[i].icon_size = 8;
+	// Set body mass [kg]
+	objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
+	objects[i].icon_num = 0;
+	objects[i].icon_size = 8;
 
-// Set body position [AU]
-// x component
-objects[i].pos[0] = 7.*PC*(2.*randomDouble()-1.);
-// y component
-objects[i].pos[1] = 0.7*PC*(2.*randomDouble()-1.);
-// z component
-objects[i].pos[2] = 0.7*PC*(2.*randomDouble()-1.);
+	// Set body position [AU]
+	// x component
+	objects[i].pos[0] = 7.*PC*(2.*randomDouble()-1.);
+	// y component
+	objects[i].pos[1] = 0.7*PC*(2.*randomDouble()-1.);
+	// z component
+	objects[i].pos[2] = 0.7*PC*(2.*randomDouble()-1.);
 
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = 0.01*(2.*randomDouble()-1.);
-// y component
-objects[i].vel[1] = 0.01*(2.*randomDouble()-1.);
-// z component
-objects[i].vel[2] = 0.01*(2.*randomDouble()-1.);
+	// Set body velocity [km/s]
+	// x component
+	objects[i].vel[0] = 0.01*(2.*randomDouble()-1.);
+	// y component
+	objects[i].vel[1] = 0.01*(2.*randomDouble()-1.);
+	// z component
+	objects[i].vel[2] = 0.01*(2.*randomDouble()-1.);
 
 
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
+	// Set identifier [DO NOT CHANGE]
+	objects[i].ident = i;
 
 }
 
@@ -309,34 +311,34 @@ double r, phi, theta;
 
 for(i=0; i<sim_set->n_bodies; i++){
 
-// Set body mass [kg]
-objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
-objects[i].icon_num = 0;
-objects[i].icon_size = 6;
+	// Set body mass [kg]
+	objects[i].mass = 0.1*M_SUN*(99.*randomDouble()+1.);
+	objects[i].icon_num = 0;
+	objects[i].icon_size = 6;
 
-r = 25.*PC*randomDouble();
-phi = randomDouble()*2.*PI;
-theta = randomDouble()*2.*PI;
+	r = 25.*PC*randomDouble();
+	phi = randomDouble()*2.*PI;
+	theta = randomDouble()*2.*PI;
 
-// Set body position [AU]
-// x component
-objects[i].pos[0] = r*sin(theta)*cos(phi);
-// y component
-objects[i].pos[1] = r*sin(theta)*sin(phi);
-// z component
-objects[i].pos[2] = r*cos(theta);
+	// Set body position [AU]
+	// x component
+	objects[i].pos[0] = r*sin(theta)*cos(phi);
+	// y component
+	objects[i].pos[1] = r*sin(theta)*sin(phi);
+	// z component
+	objects[i].pos[2] = r*cos(theta);
 
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = 0.001*(2.*randomDouble()-1.);
-// y component
-objects[i].vel[1] = 0.001*(2.*randomDouble()-1.);
-// z component
-objects[i].vel[2] = 0.001*(2.*randomDouble()-1.);
+	// Set body velocity [km/s]
+	// x component
+	objects[i].vel[0] = 0.001*(2.*randomDouble()-1.);
+	// y component
+	objects[i].vel[1] = 0.001*(2.*randomDouble()-1.);
+	// z component
+	objects[i].vel[2] = 0.001*(2.*randomDouble()-1.);
 
 
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
+	// Set identifier [DO NOT CHANGE]
+	objects[i].ident = i;
 
 }
 
@@ -363,41 +365,41 @@ n=0;
 
 for(i=0; i<sim_set->n_bodies; i++){
 
-// Set body mass [kg]
-objects[i].mass = 0.1*(double)(j+2)*M_SUN;
-objects[i].icon_num = 0;
-objects[i].icon_size = 8;
+	// Set body mass [kg]
+	objects[i].mass = 0.1*(double)(j+2)*M_SUN;
+	objects[i].icon_num = 0;
+	objects[i].icon_size = 8;
 
-// Set identifier [DO NOT CHANGE]
-objects[i].ident = i;
+	// Set identifier [DO NOT CHANGE]
+	objects[i].ident = i;
 
-j++;
-if ( j>19 ) {
-	j=0;
-	k++;
-}
+	j++;
 
-if ( k>19 ) {
-	k=0;
-	n++;
-}
+	if ( j>19 ) {
+		j=0;
+		k++;
+	}
 
-// Set body position [AU]
-// x component
-objects[i].pos[0] = x_start + (double)j*delta;
-// y component
-objects[i].pos[1] = y_start + (double)k*delta;
-// z component
-objects[i].pos[2] = z_start + (double)n*delta;
+	if ( k>19 ) {
+		k=0;
+		n++;
+	}
 
-// Set body velocity [km/s]
-// x component
-objects[i].vel[0] = 0.;
-// y component
-objects[i].vel[1] = 0.;
-// z component
-objects[i].vel[2] = 0.;
+	// Set body position [AU]
+	// x component
+	objects[i].pos[0] = x_start + (double)j*delta;
+	// y component
+	objects[i].pos[1] = y_start + (double)k*delta;
+	// z component
+	objects[i].pos[2] = z_start + (double)n*delta;
 
+	// Set body velocity [km/s]
+	// x component
+	objects[i].vel[0] = 0.;
+	// y component
+	objects[i].vel[1] = 0.;
+	// z component
+	objects[i].vel[2] = 0.;
 
 }
 
