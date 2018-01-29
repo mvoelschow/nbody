@@ -1,0 +1,2 @@
+ffmpeg -f image2 -i vel_disp_%d.png video.mpg
+ffmpeg -r 15 -f image2 -i auto_%d.bmp -r 20 -vcodec libx264 -crf 18 video.avi

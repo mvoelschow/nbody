@@ -8,7 +8,7 @@ n-body simulations for both scientific and educational purposes.
 
 Author: Marcel Völschow, Hamburg Observatory
 
-Current release: 0.3 ALPHA
+Current release: 0.4 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -48,12 +48,18 @@ Current release: 0.3 ALPHA
 
 11.02.2017:	- Benchmark mode added (calls a pre-defined standard setup)
 
-28.01.2017:	- Live view rotation implemented
+28.01.2018:	- Live view rotation implemented
 		- 3D rendering mode added
+
+30.01.2018:	- RKN7 and RKN8 implemented (tests pending)
+		- Settings and object configuration files added
+		- New sprites added
+		- Code and working directory cleanups  
 
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".
 The GNU C compiler gcc, SDL2 and SDL2_ttf must be present.
+
 
 ### A local SDL2 installation ###
 In case you don't have root priviliges on your machine, the SDL2 library can be installed locally to your home directory.
@@ -99,7 +105,19 @@ export PATH="$HOME/bin:$PATH"
 
 
 ### Running a simulation ###
-At this very early stage of the project, both the settings and the simulation setup are hard-coded in the setup.c module. 
-The main program calls the "init_bodies" routine that can be found and modified in the setup.c file. 
-For a quick start, simply call one of the example setups you can find in the examples.c file. 
-A full description on how to get started will be provided with the first official release of the code.
+Simulation settings are specified in the settings.dat file. Kinematic and positional data of the objects are provided
+via the input.dat file. Two example setups can be found in the "setups" folder.
+Supported physical units (case sensitive) are msun, mjup, pc, au, yrs, Myrs, kms (km per sec.) and ms (m per sec.).
+The input.dat file stores kinematic and positional data. The first three lines are reserved for the mass unit, spatial
+unit and the velocity unit. The fourth line is reserved for the column headers.
+The first column contains the object mass, followed by the x, y and z coordinates, again followed by the vx, vy and vz
+velocity components. The eigth column is a sprite index which can be one of the following:
+0:	Sun
+1:	Mercury
+3:	Earth
+4:	Mars
+5:	Jupiter
+8:	Neptune
+9:	Pluto
+10:	Moon
+Sprite size (in pixels) can be defined in the last column.

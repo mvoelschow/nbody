@@ -1,0 +1,23 @@
+benchmark_mode  0
+n_threads  2
+data_file  1
+n_bodies  200
+integrator  6
+eps_vel_thresh  1.e-15
+eps_pos_thresh  1.e-15
+timestep_max  1000.	days
+time_end  10.E7	yrs
+res_x  800
+res_y  800
+fullscreen  0
+mode_3D  1
+scale	16.	pc
+scale_min 	0.1	pc
+scale_max	100.	pc
+draw_background  1
+vsync  0
+interactive_mode  1
+focus_on_cms  1
+output_interval  1.e4 yrs
+auto_screenshot  0
+auto_textfile  0
