@@ -494,7 +494,7 @@ for(i=sim_set->n_bodies; i>=0; i=i-1){
 void render_all_bodies_3D(SDL_Renderer *renderer, planet objects[], settings *sim_set){
 int i, i_plot;
 double sin_y_rot, cos_y_rot, sin_x_rot, cos_x_rot;
-double icon_size, delta;
+double icon_size, min_size, delta;
 double brightness;
 double d_scale;
 
@@ -525,13 +525,14 @@ for(i=sim_set->n_bodies; i>=0; i=i-1){
 	d_scale = (objects[i_plot].z_projected) / delta;
 
 	icon_size = objects[i_plot].icon_size * (1.+d_scale);
+	min_size = 0.5*objects[i_plot].icon_size;
 
 	if ( icon_size > sim_set->icon_size_max ) icon_size = sim_set->icon_size_max;
-	if ( icon_size < 1. ) icon_size = 1.;
+	if ( icon_size < min_size ) icon_size = min_size;
 
 	if ( d_scale < 0. ){
 		brightness = 1.+d_scale;
-		if ( brightness < 0.1 ) brightness = 0.1;
+		if ( brightness < 0.5 ) brightness = 0.5;
 		if ( brightness > 1. ) brightness = 1.;
 	}
 	else{
