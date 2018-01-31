@@ -87,7 +87,8 @@ else{
 // Calculate total mass
 sim_set.m_tot = 0.;
 
-for(int i=0;i<sim_set.n_bodies;i++){
+int i=0;
+for(i=0;i<sim_set.n_bodies;i++){
 	sim_set.m_tot+=objects[i].mass;
 }
 
