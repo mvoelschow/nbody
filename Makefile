@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -m64 -O3 -flto -march=native -funroll-loops -lm `sdl2-config --cflags --libs` -lSDL2_ttf
+CFLAGS = -Wall -m64 -O3 -flto -march=native -lm `sdl2-config --cflags --libs` -lSDL2_ttf
 CFLAGS2 = -g -v -da -Q -O0 -lm `sdl2-config --cflags --libs` -lSDL2_ttf
 NAME = nbody
 SRC = source/
