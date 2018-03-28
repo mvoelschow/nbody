@@ -22,7 +22,7 @@ sim_set->benchmark_mode = 0;
 sim_set->n_threads = 2;
 
 // Read object data from input file
-sim_set->data_file = 0;
+sim_set->setup = 0;
 
 
 // *******************************
@@ -112,12 +112,14 @@ void init_technical_parameters(settings *sim_set){
 // *******************************
 sim_set->center_screen_x = 0.5*sim_set->res_x;
 sim_set->center_screen_y = 0.5*sim_set->res_y;
-sim_set->timestep = 0.1;
+sim_set->timestep_max = sim_set->timestep;
+sim_set->timestep_min = sim_set->timestep;
+sim_set->scale_max = sim_set->scale;
+sim_set->scale_min = sim_set->scale;
 sim_set->select_box_size = 40;
 sim_set->selected_object = -1;
 sim_set->scale_step = 1.05;
 sim_set->paused = 1;
-sim_set->auto_timestep = 1;
 sim_set->finished = 0;
 sim_set->resume = 0;
 sim_set->screenshot_counter = 0;
@@ -129,8 +131,6 @@ sim_set->timestep_counter = 0;
 sim_set->x_rot = 0.;
 sim_set->y_rot = 0.;
 sim_set->icon_size_max = 30.;
-sim_set->timestep_smoothing = 1.; 
-sim_set->output_delta_E = 0;     
 }
 
 
@@ -142,11 +142,15 @@ sim_set->output_delta_E = 0;
 // ***********************************************************
 void init_bodies(planet objects[], settings *sim_set){
 
-//setup_asteroid_belt_and_planet(objects, sim_set);
-//setup_planetesimals(objects, sim_set);
-//setup_planetary_system(objects, sim_set);
-//setup_stellar_filament(objects, sim_set);
-setup_stellar_sphere(objects, sim_set);
+switch(sim_set->setup){
+	case 1: setup_asteroid_belt_and_planet(objects, sim_set); break;
+	case 2: setup_planetesimals(objects, sim_set); break;
+	case 3: setup_planetary_system(objects, sim_set); break;
+	case 4: setup_stellar_filament(objects, sim_set); break;
+	case 5: setup_stellar_sphere(objects, sim_set); break;
+	case 6: setup_solar_system(objects, sim_set); break;
+	default: setup_asteroid_belt_and_planet(objects, sim_set); break;
+}
 //setup_benchmark(objects, sim_set);
 
 }
@@ -165,7 +169,6 @@ sim_set->benchmark_mode = 1;
 sim_set->n_bodies = 8000;
 sim_set->eps_vel_thresh = 1.E-16;
 sim_set->eps_pos_thresh = 1.E-16;
-sim_set->timestep_smoothing = 1.;
 sim_set->timestep_max = 100.;
 sim_set->time_end = 2.E4*YR;
 sim_set->res_x = 800;
@@ -181,7 +184,6 @@ sim_set->focus_on_cms = 1;
 sim_set->output_interval = 1.E2*YR;
 sim_set->auto_screenshot = 0;
 sim_set->auto_textfile = 0;
-sim_set->output_delta_E = 0;
 sim_set->center_screen_x = 0.5*sim_set->res_x;
 sim_set->center_screen_y = 0.5*sim_set->res_y;
 sim_set->timestep = 0.1;
@@ -189,7 +191,6 @@ sim_set->select_box_size = 40;
 sim_set->selected_object = -1;
 sim_set->scale_step = 1.05;
 sim_set->paused = 1;
-sim_set->auto_timestep = 1;
 sim_set->finished = 0;
 sim_set->screenshot_counter = 0;
 sim_set->screenshot_trigger = 1;
@@ -295,8 +296,8 @@ else{
 }
 
 // 3. line: read from data file
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->data_file) == 2 ){
-	printf("\n %s = %d", dummy, sim_set->data_file);
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->setup) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->setup);
 }
 else{
 	printf("\n Error at line 3.");
@@ -321,8 +322,9 @@ else{
 	exit(1);
 }
 
-// 6. line: velocity error threshold
+// 6. line: error threshold
 if ( fscanf(fpr, "%s %lf \n", dummy, &sim_set->eps_vel_thresh) == 2 ){
+	sim_set->eps_pos_thresh = sim_set->eps_vel_thresh;
 	printf("\n %s = %le", dummy, sim_set->eps_vel_thresh);
 }
 else{
@@ -330,34 +332,25 @@ else{
 	exit(1);
 }
 
-// 7. line: position error threshold
-if ( fscanf(fpr, "%s %lf \n", dummy, &sim_set->eps_pos_thresh) == 2 ){
-	printf("\n %s = %le", dummy, sim_set->eps_pos_thresh);
+// 7. line: timestep
+if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->timestep, unit) == 3 ){
+	printf("\n %s = %le", dummy, sim_set->timestep);
+	if ( strcmp(unit,"days") == 0 ){
+		sim_set->timestep_max = sim_set->timestep;
+	}
+	if ( strcmp(unit,"yrs") == 0 ){
+		sim_set->timestep_max = sim_set->timestep * YR;
+	}
+	if ( strcmp(unit,"Myrs") == 0 ){
+		sim_set->timestep_max = sim_set->timestep * YR *1.e6;
+	}
 }
 else{
 	printf("\n Error at line 7.");
 	exit(1);
 }
 
-// 8. line: timestep normalization
-if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->timestep_max, unit) == 3 ){
-	printf("\n %s = %le", dummy, sim_set->eps_pos_thresh);
-	if ( strcmp(unit,"days") == 0 ){
-		sim_set->timestep_max = sim_set->timestep_max;
-	}
-	if ( strcmp(unit,"yrs") == 0 ){
-		sim_set->timestep_max = sim_set->timestep_max * YR;
-	}
-	if ( strcmp(unit,"Myrs") == 0 ){
-		sim_set->timestep_max = sim_set->timestep_max * YR *1.e6;
-	}
-}
-else{
-	printf("\n Error at line 8.");
-	exit(1);
-}
-
-// 9. line: Simulation time
+// 8. line: Simulation time
 if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->time_end, unit) == 3 ){
 	printf("\n %s = %lf %s", dummy, sim_set->time_end, unit);
 
@@ -372,47 +365,47 @@ if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->time_end, unit) == 3 ){
 	}
 }
 else{
+	printf("\n Error at line 8.");
+	exit(1);
+}
+
+// 9. line: x resolution
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->res_x) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->res_x);
+}
+else{
 	printf("\n Error at line 9.");
 	exit(1);
 }
 
-// 10. line: x resolution
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->res_x) == 2 ){
-	printf("\n %s = %d", dummy, sim_set->res_x);
+// 10. line: y resolution
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->res_y) == 2){
+	printf("\n %s = %d", dummy, sim_set->res_y);
 }
 else{
 	printf("\n Error at line 10.");
 	exit(1);
 }
 
-// 11. line: y resolution
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->res_y) == 2){
-	printf("\n %s = %d", dummy, sim_set->res_y);
+// 11. line: fullscreen mode
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->fullscreen) == 2){
+	printf("\n %s = %d", dummy, sim_set->fullscreen);
 }
 else{
 	printf("\n Error at line 11.");
 	exit(1);
 }
 
-// 12. line: fullscreen mode
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->fullscreen) == 2){
-	printf("\n %s = %d", dummy, sim_set->fullscreen);
+// 12. line: mode 3D
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->mode_3D) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->mode_3D);
 }
 else{
 	printf("\n Error at line 12.");
 	exit(1);
 }
 
-// 13. line: mode 3D
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->mode_3D) == 2 ){
-	printf("\n %s = %d", dummy, sim_set->mode_3D);
-}
-else{
-	printf("\n Error at line 13.");
-	exit(1);
-}
-
-// 14. line: scale setting on startup
+// 13. line: scale setting on startup
 if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->scale, unit) == 3){
 	printf("\n %s = %lf %s", dummy, sim_set->scale, unit);
 	if ( strcmp(unit,"pc") == 0 ){
@@ -423,79 +416,47 @@ if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->scale, unit) == 3){
 	}
 }
 else{
+	printf("\n Error at line 13.");
+	exit(1);
+}
+
+// 14. line: draw background
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->draw_background) == 2){
+	printf("\n %s = %d", dummy, sim_set->draw_background);
+}
+else{
 	printf("\n Error at line 14.");
 	exit(1);
 }
 
-// 15. line: min scale setting
-if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->scale_min, unit) == 3){
-	printf("\n %s = %lf %s", dummy, sim_set->scale_min, unit);
-
-	if ( strcmp(unit,"pc") == 0 ){
-		sim_set->scale_min = sim_set->scale_min * PC;
-	}
-	if ( strcmp(unit,"au") == 0 ){
-		sim_set->scale_min = sim_set->scale_min;
-	}
+// 15. line: vsync
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->vsync) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->vsync);
 }
 else{
 	printf("\n Error at line 15.");
 	exit(1);
 }
 
-// 16. line: max scale setting
-if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->scale_max, unit) == 3){
-	printf("\n %s = %lf %s", dummy, sim_set->scale_max, unit);
-
-	if ( strcmp(unit,"pc") == 0 ){
-		sim_set->scale_max = sim_set->scale_max * PC;
-	}
-	if ( strcmp(unit,"au") == 0 ){
-		sim_set->scale_max = sim_set->scale_max;
-	}
+// 16. line: interactive mode
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->interactive_mode) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->interactive_mode);
 }
 else{
 	printf("\n Error at line 16.");
 	exit(1);
 }
 
-// 17. line: draw background
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->draw_background) == 2){
-	printf("\n %s = %d", dummy, sim_set->draw_background);
+// 17. line: center of mass-focus
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->focus_on_cms) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->focus_on_cms);
 }
 else{
 	printf("\n Error at line 17.");
 	exit(1);
 }
 
-// 18. line: vsync
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->vsync) == 2 ){
-	printf("\n %s = %d", dummy, sim_set->vsync);
-}
-else{
-	printf("\n Error at line 18.");
-	exit(1);
-}
-
-// 19. line: interactive mode
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->interactive_mode) == 2 ){
-	printf("\n %s = %d", dummy, sim_set->interactive_mode);
-}
-else{
-	printf("\n Error at line 19.");
-	exit(1);
-}
-
-// 20. line: center of mass-focus
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->focus_on_cms) == 2 ){
-	printf("\n %s = %d", dummy, sim_set->focus_on_cms);
-}
-else{
-	printf("\n Error at line 20.");
-	exit(1);
-}
-
-// 21. line: output interval
+// 18. line: output interval
 if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->output_interval, unit) == 3 ){
 	printf("\n %s = %lf %s", dummy, sim_set->output_interval, unit);
 
@@ -510,29 +471,47 @@ if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->output_interval, unit) == 3 ){
 	}
 }
 else{
+	printf("\n Error at line 18.");
+	exit(1);
+}
+
+// 19. line: automatic screenshot
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->auto_screenshot) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->auto_screenshot);
+}
+else{
+	printf("\n Error at line 19.");
+	exit(1);
+}
+
+// 20. line: automatic textfile
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->auto_textfile) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->auto_textfile);
+}
+else{
+	printf("\n Error at line 20.");
+	exit(1);
+}
+
+// 21. line: gpu support
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->use_gpu) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->use_gpu);
+}
+else{
 	printf("\n Error at line 21.");
 	exit(1);
 }
 
-// 22. line: automatic screenshot
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->auto_screenshot) == 2 ){
-	printf("\n %s = %d", dummy, sim_set->auto_screenshot);
+// 22. line: autoscale on startup
+if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->autoscale_on_startup) == 2 ){
+	printf("\n %s = %d", dummy, sim_set->autoscale_on_startup);
 }
 else{
 	printf("\n Error at line 22.");
 	exit(1);
 }
 
-// 23. line: automatic textfile
-if ( fscanf(fpr, "%s %d \n", dummy, &sim_set->auto_textfile) == 2 ){
-	printf("\n %s = %d", dummy, sim_set->auto_textfile);
-}
-else{
-	printf("\n Error at line 23.");
-	exit(1);
-}
-
-printf("\n");
+printf("\n \n");
 
 }
 

@@ -10,8 +10,6 @@
 
 
 
-
-
 void get_planar_screen_coordinates(planet objects[], settings *sim_set){
 int i;
 double scale_factor;
@@ -30,21 +28,14 @@ center_y = sim_set->center_screen_y;
 
 for(i=0; i<sim_set->n_bodies; i=i+1){
 
-x = objects[i].pos[0];
-y = objects[i].pos[1];
-z = objects[i].pos[2];
+	x = objects[i].pos[0];
+	y = objects[i].pos[1];
+	z = objects[i].pos[2];
 
-scale_factor = sim_set->res_x/sim_set->scale;
+	scale_factor = sim_set->res_x/sim_set->scale;
 
-objects[i].screen_pos[0] = center_x + scale_factor*x*cos_y_rot+scale_factor*z*sin_y_rot;
-objects[i].screen_pos[1] = center_y + scale_factor*x*sin_x_rot*sin_y_rot+scale_factor*y*cos_x_rot-scale_factor*z*sin_x_rot*cos_y_rot; 
-
-objects[i].select_box_x[0] = objects[i].screen_pos[0] - 0.5 * sim_set->select_box_size;
-objects[i].select_box_x[1] = objects[i].screen_pos[0] + 0.5 * sim_set->select_box_size;
-
-objects[i].select_box_y[0] = objects[i].screen_pos[1] - 0.5 * sim_set->select_box_size;
-objects[i].select_box_y[1] = objects[i].screen_pos[1] + 0.5 * sim_set->select_box_size;
-
+	objects[i].screen_pos[0] = center_x + scale_factor*x*cos_y_rot+scale_factor*z*sin_y_rot;
+	objects[i].screen_pos[1] = center_y + scale_factor*x*sin_x_rot*sin_y_rot+scale_factor*y*cos_x_rot-scale_factor*z*sin_x_rot*cos_y_rot; 
 
 }
 
@@ -58,8 +49,6 @@ double x, y, scale_factor;
 double x_new, y_new, scale_factor_new;
 int mx,my;
 
-if ( sim_set->scale > sim_set->scale_min ){
-
 SDL_GetMouseState(&mx,&my);
 
 scale_factor = sim_set->res_x/sim_set->scale;
@@ -80,8 +69,6 @@ y_new = (my-sim_set->center_screen_y)/scale_factor_new;
 
 sim_set->center_screen_x -= (x-x_new)*scale_factor_new;
 sim_set->center_screen_y -= (y-y_new)*scale_factor_new;
-
-}
 
 } 
 
@@ -93,8 +80,6 @@ double x, y, scale_factor;
 double x_new, y_new, scale_factor_new;
 int mx,my;
 
-if ( sim_set->scale < sim_set->scale_max ){
-
 SDL_GetMouseState(&mx,&my);
 
 scale_factor = sim_set->res_x/sim_set->scale;
@@ -116,8 +101,6 @@ y_new = (my-sim_set->center_screen_y)/scale_factor_new;
 sim_set->center_screen_x -= (x-x_new)*scale_factor_new;
 sim_set->center_screen_y -= (y-y_new)*scale_factor_new;
 
-}
-
 } 
 
 
@@ -127,8 +110,6 @@ void zoom_out(settings *sim_set){
 double scale_new;
 double x, y, scale_factor;
 double x_new, y_new, scale_factor_new;
-
-if ( sim_set->scale < sim_set->scale_max ){
 
 scale_factor = sim_set->res_x/sim_set->scale;
 
@@ -149,8 +130,6 @@ y_new = (0.5*sim_set->res_y-sim_set->center_screen_y)/scale_factor_new;
 sim_set->center_screen_x -= (x-x_new)*scale_factor_new;
 sim_set->center_screen_y -= (y-y_new)*scale_factor_new;
 
-}
-
 } 
 
 
@@ -160,9 +139,6 @@ void zoom_in(settings *sim_set){
 double scale_new;
 double x, y, scale_factor;
 double x_new, y_new, scale_factor_new;
-
-
-if ( sim_set->scale > sim_set->scale_min ){
 
 scale_factor = sim_set->res_x/sim_set->scale;
 
@@ -182,8 +158,6 @@ y_new = (0.5*sim_set->res_y-sim_set->center_screen_y)/scale_factor_new;
 
 sim_set->center_screen_x -= (x-x_new)*scale_factor_new;
 sim_set->center_screen_y -= (y-y_new)*scale_factor_new;
-
-}
 
 } 
 
@@ -350,8 +324,7 @@ SDL_DestroyTexture(text_texture);
 void render_object_info_box(SDL_Renderer *renderer, planet objects[], TTF_Font *fntCourier, settings *sim_set){
 int select;
 double v;
-
-SDL_Color clrWhite = {255,255,255,255}; 
+static const SDL_Color clrWhite = {255,255,255,255}; 
 
 select = sim_set->selected_object;
 
@@ -397,13 +370,16 @@ render_text(renderer, "Paused.", sim_set->res_x-100, sim_set->res_y-40, 90, 40, 
 
 void render_scale_setting(SDL_Renderer *renderer, TTF_Font *fntCourier, settings *sim_set){
 SDL_Rect stretchRect;
-SDL_Color clrWhite = {255,255,255,255}; 
+static const SDL_Color clrWhite = {255,255,255,255}; 
 
 render_text(renderer, "Box width", sim_set->res_x-100, 0, 90, 40, clrWhite, fntCourier);
 
+if ( sim_set->scale > sim_set->scale_max ) sim_set->scale_max = sim_set->scale;
+if ( sim_set->scale < sim_set->scale_min ) sim_set->scale_min = sim_set->scale;
+
 stretchRect.x = sim_set->res_x-100.; 
 stretchRect.y = 40.; 
-stretchRect.w = 100.*log(1. + 99999.*sim_set->scale/sim_set->scale_max)/log(99999.); 
+stretchRect.w = 100.*log(1. + 9999.*sim_set->scale/sim_set->scale_max)/log(9999.); 
 stretchRect.h = 20; 
 
 // Set drawing color to red
@@ -420,18 +396,22 @@ render_text(renderer, "au", sim_set->res_x-25, 60, 20, 40, clrWhite, fntCourier)
 
 void render_timestep_setting(SDL_Renderer *renderer, TTF_Font *fntCourier, settings *sim_set){
 SDL_Rect stretchRect;
-SDL_Color clrWhite = {255,255,255,255}; 
+static const SDL_Color clrWhite = {255,255,255,255}; 
 
-render_text(renderer, "Timestep", 10, sim_set->res_y-140, 100, 40, clrWhite, fntCourier);
+render_text(renderer, "Timestep", 10, sim_set->res_y-100, 100, 40, clrWhite, fntCourier);
 
 stretchRect.x = 10.; 
-stretchRect.y = sim_set->res_y-100.; 
-if( sim_set->timestep < sim_set->timestep_max){
-stretchRect.w = 100.*log(1. + 99999.*sim_set->timestep/sim_set->timestep_max)/log(99999.);
-}
-else{
-stretchRect.w = 100.;
-}
+stretchRect.y = sim_set->res_y-60.; 
+
+if ( sim_set->timestep > sim_set->timestep_max) sim_set->timestep_max = sim_set->timestep;
+if ( sim_set->timestep < sim_set->timestep_min) sim_set->timestep_min = sim_set->timestep;
+
+//if( sim_set->timestep < sim_set->timestep_max){
+stretchRect.w = 100.*log(1. + 9999.*sim_set->timestep/sim_set->timestep_max)/log(9999.);
+//}
+//else{
+//stretchRect.w = 100.;
+//}
 stretchRect.h = 20; 
 
 // Set drawing color to blue
@@ -439,20 +419,20 @@ SDL_SetRenderDrawColor(renderer, 0,0,255,255);
 
 SDL_RenderFillRect(renderer,&stretchRect);
 
-render_exponential(renderer, sim_set->timestep, 10, sim_set->res_y-80, 100, 40, clrWhite, fntCourier);
-render_text(renderer, "days", 85, sim_set->res_y-80, 30, 40, clrWhite, fntCourier);
-if ( sim_set->auto_timestep == 1 ) render_text(renderer, "AUTO", 10, sim_set->res_y-40, 60, 40, clrWhite, fntCourier);
+render_exponential(renderer, sim_set->timestep, 10, sim_set->res_y-40, 100, 40, clrWhite, fntCourier);
+render_text(renderer, "days", 85, sim_set->res_y-40, 30, 40, clrWhite, fntCourier);
+//if ( sim_set->auto_timestep == 1 ) render_text(renderer, "AUTO", 10, sim_set->res_y-40, 60, 40, clrWhite, fntCourier);
 
 }
 
 
 
 void render_time_information(SDL_Renderer *renderer, TTF_Font *fntCourier, settings *sim_set){
-SDL_Color clrWhite = {255,255,255,255}; 
+static const SDL_Color clrWhite = {255,255,255,255}; 
 
-render_text(renderer, "Simulated time", 10, 0, 160, 40, clrWhite, fntCourier);
+render_text(renderer, "Time", 10, 0, 60, 40, clrWhite, fntCourier);
 render_exponential(renderer, sim_set->time/YR, 10, 30, 100, 40, clrWhite, fntCourier);
-render_text(renderer, "yrs", 100, 30, 30, 40, clrWhite, fntCourier);
+render_text(renderer, "yrs", 90, 30, 30, 40, clrWhite, fntCourier);
 
 }
 

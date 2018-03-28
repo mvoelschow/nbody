@@ -10,8 +10,46 @@
 
 
 
-void center_at_cms(settings *sim_set, planet objects[]){
+void apply_autoscale(settings *sim_set, planet objects[]){
 int i;
+double dx, dy, dz;
+double r, r_max=0.;
+
+// Reset rotation
+sim_set->x_rot = 0.;
+sim_set->y_rot = 0.;
+
+center_at_cms(sim_set, objects);
+
+// Find maximum cms distance
+for(i=0; i<sim_set->n_bodies; i++){
+
+	dx = objects[i].pos[0] - sim_set->cms[0];
+	dy = objects[i].pos[1] - sim_set->cms[1];
+	dz = objects[i].pos[2] - sim_set->cms[2];
+
+	// calculate x-y distance
+	r = sqrt( dx*dx + dy*dy + dz*dz );
+
+	if ( r > r_max ) r_max = r;
+
+}
+
+sim_set->scale = 2.05*r_max;
+
+center_at_cms(sim_set, objects);
+
+// Reset scale min/max
+sim_set->scale_max = sim_set->scale;
+sim_set->scale_min = sim_set->scale;
+
+}
+
+
+
+
+void center_at_cms(settings *sim_set, planet objects[]){
+int i, j;
 double scale_factor;
 double x,y,z;
 double sin_y_rot, cos_y_rot, sin_x_rot, cos_x_rot;
@@ -24,22 +62,16 @@ sin_x_rot = sin(sim_set->x_rot*deg_to_rad);
 cos_x_rot = cos(sim_set->x_rot*deg_to_rad);
 
 // Clear CMS
-sim_set->cms[0] = 0.;
-sim_set->cms[1] = 0.;
-sim_set->cms[2] = 0.;
+for(j=0; j<3; j++) sim_set->cms[j] = 0.;
 
 // Calculate CMS coordinates
 for(i=0; i<sim_set->n_bodies; i++){
 
-	sim_set->cms[0] += objects[i].pos[0]*objects[i].mass;
-	sim_set->cms[1] += objects[i].pos[1]*objects[i].mass;
-	sim_set->cms[2] += objects[i].pos[2]*objects[i].mass;
+	for(j=0; j<3; j++) sim_set->cms[j] += objects[i].pos[j]*objects[i].mass;
 
 }
 
-sim_set->cms[0] = sim_set->cms[0]/sim_set->m_tot;
-sim_set->cms[1] = sim_set->cms[1]/sim_set->m_tot;
-sim_set->cms[2] = sim_set->cms[2]/sim_set->m_tot;
+for(j=0; j<3; j++) sim_set->cms[j] = sim_set->cms[j]/sim_set->m_tot;
 
 x = sim_set->cms[0];
 y = sim_set->cms[1];
@@ -123,7 +155,6 @@ SDL_Event event;
 int done=0;
 int x, y;
 int delta_x, delta_y;
-int i;
 
 while(SDL_PollEvent(&event)){
 
@@ -139,6 +170,10 @@ while(SDL_PollEvent(&event)){
 			{
 			switch(event.key.keysym.sym){
 
+				case SDLK_a:
+					apply_autoscale(sim_set, objects);
+				break;
+
 				case SDLK_o:
 					sim_set->center_screen_x = 0.5*sim_set->res_x;
 					sim_set->center_screen_y = 0.5*sim_set->res_y;
@@ -146,6 +181,13 @@ while(SDL_PollEvent(&event)){
 
 				case SDLK_c:
 					center_at_cms(sim_set, objects);
+				break;
+
+				case SDLK_r:
+					sim_set->timestep_max = sim_set->timestep;
+					sim_set->timestep_min = sim_set->timestep;
+					sim_set->scale_min = sim_set->scale;
+					sim_set->scale_max = sim_set->scale;
 				break;
 
 				case SDLK_DOWN:
@@ -226,7 +268,7 @@ while(SDL_PollEvent(&event)){
 			
 				// Get mouse position
 				SDL_GetMouseState( &x, &y );
-
+/*
 				// Check if a planet was clicked
 				for (i=0;i<sim_set->n_bodies;i++){
 
@@ -240,7 +282,7 @@ while(SDL_PollEvent(&event)){
 					}
 
 				}
-
+*/
 
 			}
 
@@ -351,10 +393,14 @@ void load_object_textures(SDL_Renderer *renderer, settings *sim_set){
 
 load_texture(renderer, &sim_set->icon_sun, "sprites/sun_icon.bmp");
 load_texture(renderer, &sim_set->icon_mercury, "sprites/mercury_icon.bmp");
+load_texture(renderer, &sim_set->icon_venus, "sprites/venus_icon.bmp");
 load_texture(renderer, &sim_set->icon_earth, "sprites/earth_icon.bmp");
+load_texture(renderer, &sim_set->icon_mars, "sprites/mars_icon.bmp");
 load_texture(renderer, &sim_set->icon_moon, "sprites/moon_icon.bmp");
 load_texture(renderer, &sim_set->icon_mars, "sprites/mars_icon.bmp");
 load_texture(renderer, &sim_set->icon_jupiter, "sprites/jupiter_icon.bmp");
+load_texture(renderer, &sim_set->icon_saturn, "sprites/saturn_icon.bmp");
+load_texture(renderer, &sim_set->icon_uranus, "sprites/uranus_icon.bmp");
 load_texture(renderer, &sim_set->icon_neptune, "sprites/neptune_icon.bmp");
 load_texture(renderer, &sim_set->icon_pluto, "sprites/pluto_icon.bmp");
 
@@ -365,22 +411,23 @@ load_texture(renderer, &sim_set->icon_pluto, "sprites/pluto_icon.bmp");
 
 
 
-
-
 void render_icon(SDL_Renderer *renderer, planet *object, settings *sim_set){
 SDL_Rect stretchRect;
 
-stretchRect.x = object->screen_pos[0] - 0.5*object->icon_size; 
-stretchRect.y = object->screen_pos[1] - 0.5*object->icon_size; 
-stretchRect.w = object->icon_size; 
-stretchRect.h = object->icon_size; 
+stretchRect.x = round(object->screen_pos[0] - 0.5*object->icon_size); 
+stretchRect.y = round(object->screen_pos[1] - 0.5*object->icon_size); 
+stretchRect.w = round(object->icon_size); 
+stretchRect.h = round(object->icon_size); 
 
 switch(object->icon_num) {
 	case 0: SDL_RenderCopy(renderer, sim_set->icon_sun, NULL, &stretchRect) ; break;
 	case 1: SDL_RenderCopy(renderer, sim_set->icon_mercury, NULL, &stretchRect) ; break;
+	case 2: SDL_RenderCopy(renderer, sim_set->icon_venus, NULL, &stretchRect) ; break;
 	case 3: SDL_RenderCopy(renderer, sim_set->icon_earth, NULL, &stretchRect) ; break;
 	case 4: SDL_RenderCopy(renderer, sim_set->icon_mars, NULL, &stretchRect) ; break;
 	case 5: SDL_RenderCopy(renderer, sim_set->icon_jupiter, NULL, &stretchRect) ; break;
+	case 6: SDL_RenderCopy(renderer, sim_set->icon_saturn, NULL, &stretchRect) ; break;
+	case 7: SDL_RenderCopy(renderer, sim_set->icon_uranus, NULL, &stretchRect) ; break;
 	case 8: SDL_RenderCopy(renderer, sim_set->icon_neptune, NULL, &stretchRect) ; break;
 	case 9: SDL_RenderCopy(renderer, sim_set->icon_pluto, NULL, &stretchRect) ; break;
 	case 10: SDL_RenderCopy(renderer, sim_set->icon_moon, NULL, &stretchRect) ; break;
@@ -398,19 +445,22 @@ SDL_Rect stretchRect;
 SDL_Texture *icon_modified;
 int scale;
 
-stretchRect.x = object->screen_pos[0] - 0.5*size; 
-stretchRect.y = object->screen_pos[1] - 0.5*size; 
-stretchRect.w = size; 
-stretchRect.h = size; 
+stretchRect.x = round(object->screen_pos[0] - 0.5*size); 
+stretchRect.y = round(object->screen_pos[1] - 0.5*size); 
+stretchRect.w = round(size); 
+stretchRect.h = round(size); 
 
 scale = (int)(255*brightness);
 
 switch(object->icon_num) {
 	case 0: icon_modified = sim_set->icon_sun; break;
 	case 1: icon_modified = sim_set->icon_mercury; break;
+	case 2: icon_modified = sim_set->icon_venus; break;
 	case 3: icon_modified = sim_set->icon_earth; break;
 	case 4: icon_modified = sim_set->icon_mars; break;
 	case 5: icon_modified = sim_set->icon_jupiter; break;
+	case 6: icon_modified = sim_set->icon_saturn; break;
+	case 7: icon_modified = sim_set->icon_uranus; break;
 	case 8: icon_modified = sim_set->icon_neptune; break;
 	case 9: icon_modified = sim_set->icon_pluto; break;
 	case 10: icon_modified = sim_set->icon_moon; break;
@@ -469,7 +519,7 @@ sin_x_rot = sin(sim_set->x_rot*deg_to_rad);
 cos_x_rot = cos(sim_set->x_rot*deg_to_rad);
 
 // Get projected distances 
-for(i=0; i<sim_set->n_bodies; i=i+1){
+for(i=0; i<sim_set->n_bodies; i++){
 
 	objects[i].z_projected = (-objects[i].pos[0]*cos_x_rot*sin_y_rot+objects[i].pos[1]*sin_x_rot+objects[i].pos[2]*cos_x_rot*cos_y_rot);
 	objects[i].plot_order = i;
@@ -478,7 +528,7 @@ for(i=0; i<sim_set->n_bodies; i=i+1){
 
 qsort(objects, sim_set->n_bodies, sizeof(objects[0]), compare_structs);
 
-for(i=sim_set->n_bodies; i>=0; i=i-1){
+for(i=sim_set->n_bodies-1; i>=0; i--){
 
 	i_plot = objects[i].plot_order;
 
@@ -508,7 +558,7 @@ sin_x_rot = sin(sim_set->x_rot*deg_to_rad);
 cos_x_rot = cos(sim_set->x_rot*deg_to_rad);
 
 // Get projected distances 
-for(i=0; i<sim_set->n_bodies; i=i+1){
+for(i=0; i<sim_set->n_bodies; i++){
 
 	objects[i].z_projected = (-objects[i].pos[0]*cos_x_rot*sin_y_rot+objects[i].pos[1]*sin_x_rot+objects[i].pos[2]*cos_x_rot*cos_y_rot);
 	objects[i].plot_order = i;
@@ -518,9 +568,11 @@ for(i=0; i<sim_set->n_bodies; i=i+1){
 qsort(objects, sim_set->n_bodies, sizeof(objects[0]), compare_structs);
 delta = 0.5*sim_set->scale;
 
-for(i=sim_set->n_bodies; i>=0; i=i-1){
+for(i=sim_set->n_bodies-1; i>=0; i--){
 
 	i_plot = objects[i].plot_order;
+
+	if( objects[i_plot].z_projected > delta ) continue;
 
 	d_scale = (objects[i_plot].z_projected) / delta;
 
