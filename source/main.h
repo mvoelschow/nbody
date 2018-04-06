@@ -141,6 +141,7 @@ void setup_planetary_system(planet objects[], settings *sim_set);
 void setup_stellar_filament(planet objects[], settings *sim_set);
 void setup_stellar_sphere(planet objects[], settings *sim_set);
 void setup_benchmark(planet objects[], settings *sim_set);
+void setup_solar_system(planet objects[], settings *sim_set);
 
 // From num.c
 void init_euler_gpu(cl_kernel *kernel, cl_device_id *device_id, cl_mem *body_mem_obj, cl_context *context, cl_program *program, settings *sim_set );
