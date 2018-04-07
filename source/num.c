@@ -110,7 +110,7 @@ size_t len=0;
 flag = clGetProgramBuildInfo(*program, *device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
 char *buildlog = calloc(len, sizeof(char));
 flag = clGetProgramBuildInfo(*program, *device_id, CL_PROGRAM_BUILD_LOG, len, buildlog, NULL);
-printf("\n Buildlog:   %s\n",buildlog);
+//printf("\n Buildlog:   %s\n",buildlog);
 
 *kernel_1 = clCreateKernel(*program, "verlet_tic", &flag);
 *kernel_2 = clCreateKernel(*program, "verlet_toc", &flag);
