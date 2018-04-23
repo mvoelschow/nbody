@@ -8,7 +8,7 @@
 
 
 void Generate_Output_File( planet objects[], settings *sim_set ){
-char path[4];
+char path[32];
 FILE *ofp; 
 int i;
 
