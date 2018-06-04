@@ -38,7 +38,7 @@ for(k=i+1; k<n; k++){
 }
 
 // Assign new position and velocity
-for(j=0;j<3;j++) bodies[i].vel_new[j] = bodies[i].vel[j]+a[j]*dt*1.49597871e8;
-for(j=0;j<3;j++) bodies[i].pos_new[j] = bodies[i].pos[j]+bodies[i].vel[j]*dt*6.684587e-9;
-
+for(j=0;j<3;j++){
+	bodies[i].vel_new[j] = bodies[i].vel[j]+a[j]*dt*1.49597871e8;
+	bodies[i].pos_new[j] = bodies[i].pos[j]+bodies[i].vel_new[j]*dt*6.684587e-9;
 }
