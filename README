@@ -145,7 +145,7 @@ In CPU mode, a total of nine different integrators are available:
 Integrators 2, 3 and 4 are symplectic but require you to set a proper timestep in line 7 of settings.dat.
 Integrators 5 to 9 are not symplectic, but automatically calculate appropriate timesteps to limit per-step
 errors to the relative threshold specified in line 6.
-If you set use_gpu to 1 (line 21), you can chose between option 1 which is an Euler integrator and option 2
+If you set use_gpu to 1 (line 21), you can chose between option 1 which is a Semi-Implicit Euler integrator and option 2
 which is a second-order Velocity Verlet. The Euler integrator is intended for debugging purposes and not optimized
 in any way, so you're basically left with option 2.
 
