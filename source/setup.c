@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <time.h>
+#include <string.h>
 
 #include "main.h"
 
