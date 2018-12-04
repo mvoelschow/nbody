@@ -343,14 +343,16 @@ const size_t global_item_size = sim_set->n_bodies;
 const int n_bodies = sim_set->n_bodies;
 cl_int flag;
 
+/*
 
 // Fill struct bodies with data
+// Some leaky versions of OpenCL need this as a workaround ...
 for(i=0; i<n_bodies; i++){
 	for(j=0; j<3; j++) bodies[i].pos[j] = (float)(objects[i].pos[j]); 	// position in AU
 	for(j=0; j<3; j++) bodies[i].vel[j] = (float)(objects[i].vel[j]);	// vel in km/s
 	bodies[i].mass = (float)(objects[i].mass/M_SUN);	
 }
-
+*/
 
 // Copy struct body to respective memory buffer
 flag = clEnqueueWriteBuffer(*command_queue, *body_mem_obj, CL_TRUE, 0, n_bodies * sizeof(body_gpu), bodies, 0, NULL, NULL);
