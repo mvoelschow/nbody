@@ -335,15 +335,17 @@ else{
 
 // 7. line: timestep
 if ( fscanf(fpr, "%s %lf %s \n", dummy, &sim_set->timestep, unit) == 3 ){
-	printf("\n %s = %le", dummy, sim_set->timestep);
+	printf("\n %s = %lf %s", dummy, sim_set->timestep, unit);
 	if ( strcmp(unit,"days") == 0 ){
 		sim_set->timestep_max = sim_set->timestep;
 	}
 	if ( strcmp(unit,"yrs") == 0 ){
 		sim_set->timestep_max = sim_set->timestep * YR;
+		sim_set->timestep = sim_set->timestep * YR;
 	}
 	if ( strcmp(unit,"Myrs") == 0 ){
 		sim_set->timestep_max = sim_set->timestep * YR *1.e6;
+		sim_set->timestep = sim_set->timestep * YR *1.e6;
 	}
 }
 else{
