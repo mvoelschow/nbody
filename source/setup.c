@@ -614,6 +614,7 @@ printf("\n Reading object data ...");
 // Read object data
 for(i=0; i<sim_set->n_bodies; i++){                        
 
+	objects[i].ident = i;
 	if ( fscanf(fpr,"%lf %lf %lf %lf %lf %lf %lf %d %lf",&objects[i].mass, &objects[i].pos[0], &objects[i].pos[1], &objects[i].pos[2], &objects[i].vel[0], &objects[i].vel[1], &objects[i].vel[2], &objects[i].icon_num, &objects[i].icon_size) == 9 ){
 
 		// Unit conversion
