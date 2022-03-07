@@ -1,81 +1,93 @@
-######################################################################################
-####################                    nbody 			  ####################
-######################################################################################
+# nbody
+## Abstract
 
 nbody is a simple gravitational n-body code written in C, parallelized with OpenMP and OpenCL
 for shared-memory systems and GPUs. The program utilizes the SDL2 library for graphical output, 
 making it a handy tool to run interactive n-body simulations for both scientific and 
 educational purposes.
 
-Author: Marcel Völschow, Hamburg University of Applied Sciences
-
 Current release: 0.5.1 ALPHA
 
-### Changelog ###
-04.01.2017:   	- nbody 0.1 ALPHA released
+## Changelog
 
-18.01.2017:   	- VSYNC switch added
-              	- Integrator switch added
-              	- Object icon (Sun, Mercury, Earth, Jupiter) can be specified
-              	- Object icon size can be customized in the init_bodies procedure
+04.01.2017:   	
+- nbody 0.1 ALPHA released
 
-20.01.2017:	- RKN5 implemented (stability tests pending)
+18.01.2017:
+- VSYNC switch added
+- Integrator switch added
+- Object icon (Sun, Mercury, Earth, Jupiter) can be specified
+- Object icon size can be customized in the init_bodies procedure
 
-22.01.2017:	- High CPU load in pause mode bug fixed
+20.01.2017:
+- RKN5 implemented (stability tests pending)
 
-23.01.2017:	- Numerical stats output implemented 
-		- Code cleanups
+22.01.2017:
+- High CPU load in pause mode bug fixed
 
-24.01.2017:	- RKN5 stability tests completed
-		- RKN5 performance optimized
-		- Right-click object info box deactivated (buggy)
-		- More rigerous truncation error calculation method (minimum fe)
-		- Timestep smoothing option added
+23.01.2017
+- Numerical stats output implemented 
+- Code cleanups
 
-31.01.2017:	- Minor code cleanups
-		- Interactive mode switch implemented
-		- Center-of-mass focus added
+24.01.2017:
+- RKN5 stability tests completed
+- RKN5 performance optimized
+- Right-click object info box deactivated (buggy)
+- More rigerous truncation error calculation method (minimum fe)
+- Timestep smoothing option added
 
-01.02.2017:	- Minor RKN5 optimizations
-		- RKN5 parallelized
-		- Number of threads can be specified
-		- Code cleanups 
-		- examples.c added
+31.01.2017:
+- Minor code cleanups
+- Interactive mode switch implemented
+- Center-of-mass focus added
 
-06.02.2017:	- New example setups added
+01.02.2017:
+- Minor RKN5 optimizations
+- RKN5 parallelized
+- Number of threads can be specified
+- Code cleanups 
+- examples.c added
 
-09.02.2017:	- Barnes-Hut tree algorithm implementation started
+06.02.2017:
+- New example setups added
 
-11.02.2017:	- Benchmark mode added (calls a pre-defined standard setup)
-		- RKN6 implemented and parallelized
+09.02.2017:
+- Barnes-Hut tree algorithm implementation started
 
-28.01.2018:	- Live view rotation implemented
-		- 3D rendering mode added
+11.02.2017:
+- Benchmark mode added (calls a pre-defined standard setup)
+- RKN6 implemented and parallelized
 
-30.01.2018:	- RKN7 and RKN8 implemented (tests pending)
-		- Settings and object configuration files added
-		- New sprites added
-		- Code and working directory cleanups  
+28.01.2018:
+- Live view rotation implemented
+- 3D rendering mode added
 
-28.03.2018:	- RKN9 implemented
-		- New symplectic integrators: Velocity Verlet (2), Forest Ruthe (3), Position-Extended Forest Ruthe (4)
-		- GPU support via OpenCL for Velocity Verlet and Euler integrators
-		- Bugfixes and cleanups in 3D rendering routine
-		- Auto scale on startup implemented
-		- Various default setups accessible via settings.dat
-		- VSOP87 Series E solar system ephemeris implemented (setup 6)
+30.01.2018:
+- RKN7 and RKN8 implemented (tests pending)
+- Settings and object configuration files added
+- New sprites added
+- Code and working directory cleanups  
 
-07.03.2022:	- Conversion to a VS Code project
-			- Massive code refactorings and cleanups
+28.03.2018:
+- RKN9 implemented
+- New symplectic integrators: Velocity Verlet (2), Forest Ruthe (3), Position-Extended Forest Ruthe (4)
+- GPU support via OpenCL for Velocity Verlet and Euler integrators
+- Bugfixes and cleanups in 3D rendering routine
+- Auto scale on startup implemented
+- Various default setups accessible via settings.dat
+- VSOP87 Series E solar system ephemeris implemented (setup 6)
 
-### How to get started ###
+07.03.2022:
+- Conversion to a VS Code project
+- Massive code refactorings and cleanups
+
+## How to get started
 Download the repository zip, unpack the archive, open a terminal and type "make".
 The GNU C compiler gcc, SDL2, SDL2_ttf are required.
 If you're using APT, just make sure that libsdl2-dev and libsdl2-ttf-dev are present.
 Even if you don't want to make use of a GPU integrator, OpenCL librariers must be present (in APT: opencl-c-headers, nvidia-opencl-dev).
 
-
-### A local SDL2 installation ###
+## A local SDL2 installation
 In case you don't have root priviliges on your machine, the SDL2 library can be installed locally to your home directory.
 
 1. Download the SDL2 source code from https://www.libsdl.org/release/SDL2-2.0.7.zip
@@ -108,7 +120,7 @@ export PATH="$HOME/bin:$PATH"
 4. Save the file, close gedit and close the terminal.
 
 
-### Setting up a simulation ###
+## Setting up a simulation
 Simulation settings are specified in the settings.dat file. The most straight-forward approach to run a simulation is changing line 3 
 to initialize one of the hard-coded example setups:
 1:	Asteroid belt and Jovian planet orbiting the sun
@@ -158,7 +170,7 @@ Lines 18 to 20 specify the type and frequency of output. Note that the output im
 4 MB per Megapixel per image. 
 
 
-### Running a simulation ###
+## Running a simulation
 nbody starts in paused mode. The simulation window can be moved freely by left-clicking and dragging the mouse to the desired direction.
 You can also zoom in and out using the mouse wheel or the PgUp and PgDown keys. 
 Key bindings:
