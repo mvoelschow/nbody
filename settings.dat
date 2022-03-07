@@ -1,13 +1,13 @@
 benchmark_mode  0
-n_threads  1
+n_threads  11
 setup  6
-n_bodies  400
-integrator  4
+n_bodies  10000
+integrator  2
 error_thresh  1.e-16
 timestep  1.	days
-time_end  1.E2	yrs
-res_x  800
-res_y  600
+time_end  1.E3	yrs
+res_x  1800
+res_y  1100
 fullscreen  0
 mode_3D  1
 scale	16.	au
@@ -15,8 +15,8 @@ draw_background  0
 vsync  0
 interactive_mode  1
 focus_on_cms  0
-output_interval  0.1 yrs
+output_interval  10.0 yrs
 auto_screenshot  0
 auto_textfile  0
-use_gpu 0
+use_gpu 1
 autoscale 1

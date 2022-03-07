@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -m64 -O3 -march=native -lm `sdl2-config --cflags --libs` -lSDL2_ttf -lOpenCL
+CFLAGS = -m64 -Ofast -march=native -lm `sdl2-config --cflags --libs` -lSDL2_ttf -lOpenCL
 CFLAGS2 = -g -Wall -O0 -lm `sdl2-config --cflags --libs` -lSDL2_ttf -lOpenCL
 NAME = nbody
 SRC = source/

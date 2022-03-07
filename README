@@ -7,9 +7,9 @@ for shared-memory systems and GPUs. The program utilizes the SDL2 library for gr
 making it a handy tool to run interactive n-body simulations for both scientific and 
 educational purposes.
 
-Author: Marcel Völschow, Hamburg Observatory
+Author: Marcel Völschow, Hamburg University of Applied Sciences
 
-Current release: 0.5 ALPHA
+Current release: 0.5.1 ALPHA
 
 ### Changelog ###
 04.01.2017:   	- nbody 0.1 ALPHA released
@@ -65,10 +65,14 @@ Current release: 0.5 ALPHA
 		- Various default setups accessible via settings.dat
 		- VSOP87 Series E solar system ephemeris implemented (setup 6)
 
+07.03.2022:	- Conversion to a VS Code project
+			- Massive code refactorings and cleanups
+
 ### How to get started ###
 Download the repository zip, unpack the archive, open a terminal and type "make".
 The GNU C compiler gcc, SDL2, SDL2_ttf are required.
-Even if you don't want to make use of a GPU integrator, OpenCL librariers must be present.
+If you're using APT, just make sure that libsdl2-dev and libsdl2-ttf-dev are present.
+Even if you don't want to make use of a GPU integrator, OpenCL librariers must be present (in APT: opencl-c-headers, nvidia-opencl-dev).
 
 
 ### A local SDL2 installation ###
